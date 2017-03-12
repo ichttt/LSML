@@ -18,7 +18,7 @@ import logicsim.App;
  */
 public final class LogicSimModLoader {
     private static App app;
-    public static final VersionBase LSML_VERSION = new VersionBase(0,0,3);
+    public static final VersionBase LSML_VERSION = new VersionBase(0,0,1);
     public static final EventBus LSML_EVENT_BUS = new EventBus();
     private static boolean hasInit = false;
 
@@ -26,7 +26,6 @@ public final class LogicSimModLoader {
      * Starts off LSML and LogicSim itself
      */
     public static void main(String[] args) {
-//        System.setSecurityManager(new ModSecurityManager());
         coreInit();
         Loader loader = Loader.getInstance();
         //Init our mod first

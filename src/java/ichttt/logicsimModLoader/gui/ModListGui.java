@@ -1,6 +1,5 @@
 package ichttt.logicsimModLoader.gui;
 
-import com.google.common.base.Preconditions;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 

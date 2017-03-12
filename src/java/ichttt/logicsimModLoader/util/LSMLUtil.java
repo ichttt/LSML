@@ -3,7 +3,6 @@ package ichttt.logicsimModLoader.util;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.lang.annotation.Annotation;

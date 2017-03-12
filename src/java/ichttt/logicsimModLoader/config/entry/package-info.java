@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package ichttt.logicsimModLoader.config.entry;
+
+import javax.annotation.ParametersAreNonnullByDefault;

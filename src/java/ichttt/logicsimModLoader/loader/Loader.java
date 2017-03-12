@@ -1,5 +1,6 @@
 package ichttt.logicsimModLoader.loader;
 
+import com.google.common.base.Strings;
 import com.sun.istack.internal.Nullable;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.exceptions.ModException;
@@ -144,7 +145,8 @@ public class Loader {
                 if (getModContainerForModID((currentMod).modid()) != null) {
                     LSMLLog.warning("Found duplicate modid %s, skipping!", (currentMod).modid());
                 }
-
+                // Check the modid
+                doModChecks(currentMod);
                 ModContainer container = new ModContainer(currentMod);
                 //Register mod to the EventBus
                 try {
@@ -171,6 +173,7 @@ public class Loader {
      */
     public void addMod(Class clazz, ModContainer mod) {
         LSMLLog.info("Manually adding mod " + mod.mod.modid());
+        doModChecks(mod.mod);
         try {
             register(clazz);
         } catch (Exception e) {
@@ -192,5 +195,14 @@ public class Loader {
         Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class); //THX people over at stackoverflow
         method.setAccessible(true);
         method.invoke(ClassLoader.getSystemClassLoader(), file.toURI().toURL()); // Hack the system Classloader
+    }
+
+    private void doModChecks(Mod mod) {
+        if (Strings.isNullOrEmpty(mod.modid()))
+            throw new RuntimeException("Modid cannot be empty!");
+        for (ModContainer container : mods) {
+            if (container.mod.modid().equals(mod.modid()))
+                throw new RuntimeException("Found duplicate modid" + mod.modid());
+        }
     }
 }
