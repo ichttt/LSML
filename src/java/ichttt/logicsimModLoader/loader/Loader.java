@@ -1,8 +1,8 @@
 package ichttt.logicsimModLoader.loader;
 
 import com.google.common.base.Strings;
-import com.sun.istack.internal.Nullable;
 import ichttt.logicsimModLoader.api.Mod;
+import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.exceptions.ModException;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
@@ -10,6 +10,7 @@ import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
@@ -49,6 +50,8 @@ public class Loader {
     public final Path basePath;
     @Nonnull
     public final File configPath;
+    @Nonnull
+    public final File libPath;
     private List<ModContainer> mods = new ArrayList<ModContainer>();
 
     /**
@@ -58,18 +61,6 @@ public class Loader {
      */
     public List<ModContainer> getMods() {
         return new ArrayList<>(mods);
-    }
-
-    private static void createDirsIfNotExist(File path, String successMessage, String failMessage) {
-        if (!path.exists()) {
-            if (path.mkdirs()) {
-                LSMLLog.fine(successMessage);
-            }
-            else {
-                LSMLLog.error(failMessage);
-                throw new RuntimeException(failMessage);
-            }
-        }
     }
 
     /**
@@ -90,8 +81,18 @@ public class Loader {
         basePath = Paths.get(".").toAbsolutePath().normalize();
         configPath = new File(basePath + "/config");
         modPath = new File(basePath + "/mods");
+        libPath = new File(basePath + "/libs");
         createDirsIfNotExist(modPath, "Successfully create mods folder", "Could not create mod path!");
         createDirsIfNotExist(configPath, "Successfully create config folder", "Could not create config path!");
+        createDirsIfNotExist(libPath, null, null);
+
+        //Load libs. We do this here because something else may need it
+        File[] libs = libPath.listFiles();
+        if (libs == null) {
+            LSMLLog.error("Could not load libs - libPath.listFiles returned null!");
+            throw new RuntimeException("Could not load libs - libPath.listFiles returned null!");
+        }
+        Arrays.stream(libs).forEach(Loader::addURL); //Add the libs to classpath
     }
 
     /**
@@ -100,8 +101,10 @@ public class Loader {
      */
     public void searchMods() {
         Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        if (mod != null)
+        if (mod != null && !LogicSimModLoader.isInDev())
             throw new ModException(mod, "Mod called search mods. THIS IS NOT ALLOWED!");
+        else
+            LSMLLog.fine("Loading mods...");
         File[] files = modPath.listFiles();
         if (files == null) {
             LSMLLog.error("Could not load mods - modPath.listFiles returned null!");
@@ -112,18 +115,13 @@ public class Loader {
         for (File possibleMod : files) {
             if (!possibleMod.isFile() || !possibleMod.getName().endsWith(".jar")) {
                 if (!possibleMod.getName().endsWith(".modinfo"))
-                    LSMLLog.info("Ignoring non-Jarfile %s. It will be ignored", possibleMod);
+                    LSMLLog.info("Found non-Jarfile %s. It will be ignored", possibleMod);
             } else {
-                LSMLLog.fine("Found possible mod %s. Injection into classpath", possibleMod);
-                try {
-                    addURL(possibleMod);
-                }
-                catch (Exception e) {
-                    LSMLLog.error("Could not add mod %s to the ClassLoader! Exception caught: %s\nThis mod will be skipped", possibleMod, e);
-                }
+                LSMLLog.fine("Found possible mod %s.", possibleMod);
                 modFiles.add(possibleMod);
             }
         }
+
         LSMLLog.info("Successfully injected %s mods.", modFiles.size());
         for (File modFile : modFiles) {
             try {
@@ -133,6 +131,10 @@ public class Loader {
                 } catch (FileNotFoundException e) {
                     LSMLLog.info("No ModInfo for file %s found - ignoring", modFile);
                     continue;
+                }
+
+                if (!addURL(modFile)) { //Add to classpath
+                    LSMLLog.warning("Skipping mod %s as it failed to inject into classpath!", modFile);
                 }
 
                 Class<?> modClass = Class.forName(pathToInstance);
@@ -162,7 +164,7 @@ public class Loader {
     }
 
     private void register(Class<?> clazz) throws IllegalAccessException, InstantiationException {
-        LogicSimModLoader.LSML_EVENT_BUS.register(clazz.newInstance());
+        LSMLEventBus.EVENT_BUS.register(clazz.newInstance());
     }
 
     /**
@@ -191,10 +193,33 @@ public class Loader {
         addMod(clazz, new ModContainer((Mod) clazz.getAnnotation(Mod.class)));
     }
 
-    private static void addURL(File file) throws Exception {
-        Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class); //THX people over at stackoverflow
-        method.setAccessible(true);
-        method.invoke(ClassLoader.getSystemClassLoader(), file.toURI().toURL()); // Hack the system Classloader
+    private static void createDirsIfNotExist(File path,@Nullable String successMessage,@Nullable String failMessage) {
+        if (!path.exists()) {
+            if (path.mkdirs()) {
+                if (successMessage != null)
+                    LSMLLog.fine(successMessage);
+            }
+            else {
+                if (failMessage != null) {
+                    LSMLLog.error(failMessage);
+                    throw new RuntimeException(failMessage);
+                }
+            }
+        }
+    }
+
+    private static boolean addURL(File file) {
+        try {
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class); //THX people over at stackoverflow
+            method.setAccessible(true);
+            method.invoke(ClassLoader.getSystemClassLoader(), file.toURI().toURL()); // Hack the system Classloader
+            LSMLLog.fine("Added file %s to the classpath", file);
+            return true;
+        }
+        catch (Throwable e) {
+            LSMLLog.error("Could not add file %s to the classloader. Exception caught: %s\nThis file will be skipped", file, e);
+            return false;
+        }
     }
 
     private void doModChecks(Mod mod) {

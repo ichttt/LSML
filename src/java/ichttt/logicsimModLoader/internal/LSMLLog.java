@@ -19,6 +19,7 @@ public class LSMLLog {
             LSMLLog.warning("Tried init the logger twice!");
             return;
         }
+        logger.setLevel(Level.ALL);
         hasInit = true;
         Handler handler;
         String logPath = Loader.getInstance().basePath.toString() + "/log";
@@ -39,6 +40,10 @@ public class LSMLLog {
 
     public static void log(String s, Level level, Object... format) {
         logger.log(level, String.format(s, format));
+    }
+
+    public static void log(String s, Level level, Throwable throwable) {
+        logger.log(level, s, throwable);
     }
 
     public static void fine(String s, Object... format) {
