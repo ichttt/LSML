@@ -2,6 +2,10 @@ package ichttt.logicsimModLoader;
 
 import ichttt.logicsimModLoader.exceptions.InvalidVersionStringException;
 
+/**
+ * A basic version system. The version is immutable
+ * @since 0.0.1
+ */
 public class VersionBase {
     public final int major, minor, patch;
 
@@ -39,6 +43,11 @@ public class VersionBase {
         return String.format("%s.%s.%s", major , minor, patch);
     }
 
+    /**
+     * Checks this version against another
+     * @param versionBase The minimum requirement
+     * @return true if the requirement is satisfied
+     */
     public boolean isMinimum(VersionBase versionBase) {
         if (this.major<versionBase.major)
             return false;
