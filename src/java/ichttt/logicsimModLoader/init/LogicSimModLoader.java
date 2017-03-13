@@ -13,6 +13,7 @@ import ichttt.logicsimModLoader.loader.Loader;
 import logicsim.App;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
 import java.util.logging.Level;
 
 
@@ -49,6 +50,8 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
      * Dont't start from here if you are in a dev environment, start from {@link #startFromDev()}
      */
     public static void main(@Nullable String[] args) {
+        if (hasInit)
+            return;
         Thread.setDefaultUncaughtExceptionHandler(new LogicSimModLoader());
         Loader loader = Loader.getInstance(); //init loader to load libs
         coreInit();
@@ -80,6 +83,11 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         ConfigInit.init();
     }
 
+    /**
+     * Gets the app singleton from LogicSim
+     * @return the singleton or null if not yet init
+     */
+    @Nullable
     public static App getApp() {
         return app;
     }
@@ -88,6 +96,8 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
     public void uncaughtException(Thread t, Throwable e) {
         LSMLLog.error("----------REPORTING EXCEPTION THROWN----------");
         LSMLLog.log("An exception occured and LSML could not continue working!", Level.SEVERE, e);
+        JInternalFrame frame  = getApp() == null ? null : getApp().lsframe;
+            JOptionPane.showMessageDialog(frame, "There was an unexpected error and LSML could not continue. Futher information can be found in the log" , "Exception in app", JOptionPane.ERROR_MESSAGE);
         System.exit(-1);
     }
 }
