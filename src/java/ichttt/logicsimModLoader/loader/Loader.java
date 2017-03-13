@@ -127,7 +127,7 @@ public class Loader {
             try {
                 String pathToInstance;
                 try {
-                    pathToInstance = ModDataReader.parseAnnotationInfo(modFile.toString().substring(0, modFile.toString().length() - 4));
+                    pathToInstance = ModDataReader.parseModInfo(modFile, modFile.toString().substring(0, modFile.toString().length() - 4));
                 } catch (FileNotFoundException e) {
                     LSMLLog.info("No ModInfo for file %s found - ignoring", modFile);
                     continue;
