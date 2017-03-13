@@ -1,5 +1,8 @@
 package logicsim;
 
+import ichttt.logicsimModLoader.event.GateConstructionEvent;
+import ichttt.logicsimModLoader.event.LSMLEventBus;
+
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
@@ -43,16 +46,17 @@ public abstract class Gate implements Serializable {
   transient boolean active;
 
 
-  Vector in;  // enth�lt f�r jeden Eingang ein Wire Objekt
+  public final Vector<Wire> in;  // enth�lt f�r jeden Eingang ein Wire Objekt //LSML: make public and final, use Generics
   boolean[] out = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
   int[] inputTypes = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
   int numInput;
 
   public Gate() {
-    in=new Vector(16);
+    in=new Vector<>(16); //LSML: generics
     for (int i=0; i<16; i++)
       in.addElement(null);
     active=true;
+    LSMLEventBus.EVENT_BUS.post(new GateConstructionEvent(this)); //LSML: Fire GateConstructionEvent
   }
   public Gate(Wire w) {
     this();

@@ -15,10 +15,10 @@ import java.io.*;
 public class GateList implements Serializable {
   static final long serialVersionUID = 3458986578856078326L;
 
-  public Vector gates; //LSML: make public
+  public final Vector<Gate> gates; //LSML: make public and final, uses generics
 
   public GateList() {
-    gates=new Vector();
+    gates=new Vector<>(); //LSML generics
   }
 
   public void addGate(Gate g) {
