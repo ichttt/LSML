@@ -1,11 +1,13 @@
 package ichttt.logicsimModLoader.event.loading;
 
 import com.google.common.base.Preconditions;
+import ichttt.logicsimModLoader.api.ISaveHandler;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.gui.ModListGui;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
+import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 /**
@@ -41,5 +43,16 @@ public class LSMLRegistrationEvent {
      */
     public void registerModGui(Mod yourMod, IModGuiInterface guiInterface) {
         ModListGui.registerModGui(yourMod, guiInterface);
+    }
+
+    @Deprecated
+    public void registerSaveHandler(ISaveHandler handler) {
+        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
+        Preconditions.checkNotNull(mod, "Failed to get ModContainer!");
+        SaveHandler.registerSaveHandler(mod, handler);
+    }
+
+    public void registerSaveHandler(Mod yourMod, ISaveHandler handler) {
+        SaveHandler.registerSaveHandler(yourMod, handler);
     }
 }

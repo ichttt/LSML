@@ -1,9 +1,11 @@
 package ichttt.logicsimModLoader.config;
 
 
+import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.entry.ConfigEntryBase;
 import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.exceptions.MalformedConfigException;
+import ichttt.logicsimModLoader.exceptions.ModException;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
@@ -23,6 +25,7 @@ public class Config extends ConfigElement {
     private final List<ConfigCategory> categoryList = new ArrayList<>();
     private final String modName;
     private static final List<IConfigEntryParser> entryParsers = new ArrayList<>();
+    private static boolean registrationAllowed = true;
 
     public Config(String modName, File configFile) {
         super(0);
@@ -176,12 +179,35 @@ public class Config extends ConfigElement {
     }
 
     /**
+     * INTERNAL USE ONLY
+     * @since 0.0.2
+     */
+    public static void closeRegistrationWindow() {
+        if (!registrationAllowed) {
+            LSMLLog.fine("Should close registration window but already closed!");
+            return;
+        }
+        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
+        if (mod != null)
+            throw new ModException(mod, "A mod tried closing the registration window. THIS IS NOT ALLOWED!");
+        registrationAllowed = false;
+    }
+
+    /**
      * Register your own custom {@link IConfigEntryParser}.
      * Only register one time per class
+     * <b>This should be done during LSMLRegistrationEvent</b>.
      * @param parser Your custom parser
      * @since 0.0.1
      */
     public static void registerCustomEntryParser(IConfigEntryParser parser) {
+        if (!registrationAllowed) {
+            Mod mod = LSMLUtil.getActiveModFromCurrentThread();
+            if (mod != null)
+                LSMLLog.warning("A config parser from mod %s (modid %s) is registered late!", mod.modName(), mod.modid());
+            else
+                LSMLLog.warning("A config parser from is registered late!");
+        }
         if (!entryParsers.contains(parser)) //TODO if not singleton, this may not catch a duplicate!
             entryParsers.add(parser);
         else

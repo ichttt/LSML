@@ -28,6 +28,7 @@ public class ConfigTest {
         config.addCategory(general);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test(timeout = 5000L)
     public void test() throws Exception{
         if (configFile.exists())

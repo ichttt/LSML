@@ -1,6 +1,11 @@
 LSML changelog
 
-0.0.1 initial release
+0.0.2:
+Mods can be validated via SHA1String=[string] in their modinfo file
+new GateConstructionEvent
+
+
+0.0.1: initial release
 
 ============================
 

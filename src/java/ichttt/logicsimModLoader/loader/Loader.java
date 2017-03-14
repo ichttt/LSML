@@ -144,9 +144,6 @@ public class Loader {
                     continue;
                 }
 
-                if (getModContainerForModID((currentMod).modid()) != null) {
-                    LSMLLog.warning("Found duplicate modid %s, skipping!", (currentMod).modid());
-                }
                 // Check the modid
                 doModChecks(currentMod);
                 ModContainer container = new ModContainer(currentMod);
@@ -225,9 +222,8 @@ public class Loader {
     private void doModChecks(Mod mod) {
         if (Strings.isNullOrEmpty(mod.modid()))
             throw new RuntimeException("Modid cannot be empty!");
-        for (ModContainer container : mods) {
-            if (container.mod.modid().equals(mod.modid()))
-                throw new RuntimeException("Found duplicate modid" + mod.modid());
+        if (getModContainerForModID(mod.modid()) != null) {
+            throw new RuntimeException("Found duplicate modid " + mod.modid());
         }
     }
 }

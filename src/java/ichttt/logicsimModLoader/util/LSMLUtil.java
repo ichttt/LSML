@@ -1,9 +1,12 @@
 package ichttt.logicsimModLoader.util;
 
 import ichttt.logicsimModLoader.api.Mod;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
+import logicsim.App;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
 import java.io.Closeable;
 import java.lang.annotation.Annotation;
 
@@ -76,6 +79,30 @@ public class LSMLUtil {
             return (Mod) annotation;
         }
         return null;
+    }
+
+    /**
+     * Shows a {@link javax.swing.JOptionPane} on the main window if the main window is constructed
+     * @since 0.0.2
+     */
+    public static void showMessageDialogOnWindowIfAvailable(String message) {
+        App app = LogicSimModLoader.getApp();
+        if (app != null)
+            JOptionPane.showMessageDialog(app.lsframe, message);
+        else
+            JOptionPane.showMessageDialog(null, message);
+    }
+
+    /**
+     * Shows a {@link javax.swing.JOptionPane} on the main window if the main window is constructed
+     * @since 0.0.2
+     */
+    public static void showMessageDialogOnWindowIfAvailable(String message, String title, int messageType) {
+        App app = LogicSimModLoader.getApp();
+        if (app != null)
+            JOptionPane.showMessageDialog(app.lsframe, message, title, messageType);
+        else
+            JOptionPane.showMessageDialog(null, message, title, messageType);
     }
 
     /**

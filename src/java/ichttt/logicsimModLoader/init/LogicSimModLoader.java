@@ -2,6 +2,7 @@ package ichttt.logicsimModLoader.init;
 
 import ichttt.logicsimModLoader.ModState;
 import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.event.loading.LSMLPostInitEvent;
 import ichttt.logicsimModLoader.event.loading.LSMLPreInitEvent;
@@ -9,6 +10,7 @@ import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.internal.LSMLInternalMod;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
+import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
 import logicsim.App;
 
@@ -65,11 +67,15 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         loader.searchMods();
 
         LSMLEventBus.EVENT_BUS.post(new LSMLRegistrationEvent());
+        //Close registration window for CustomConfigLoaders
+        Config.closeRegistrationWindow();
         LSMLEventBus.EVENT_BUS.post(new LSMLPreInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.PREINIT);
         app = new App(); // This starts LogicSim
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.POSTINIT);
+        //Close registration window for CustomSaves
+        SaveHandler.closeRegistrationWindow();
     }
 
     /**
@@ -81,6 +87,11 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         hasInit = true;
         LSMLLog.init();
         ConfigInit.init();
+        registerSubscriptions();
+    }
+
+    private static void registerSubscriptions() {
+        LSMLEventBus.EVENT_BUS.register(new SaveHandler());
     }
 
     /**

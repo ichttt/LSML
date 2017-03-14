@@ -3,7 +3,6 @@ package ichttt.logicsimModLoader.internal;
 import ichttt.logicsimModLoader.ModState;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.event.loading.LSMLInitEvent;
-import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.gui.MenuBarHandler;
 
 import javax.swing.*;

@@ -35,7 +35,7 @@ public class LSMLInternalMod implements IModGuiInterface {
 
     @Subscribe
     public void onPreInit(LSMLPreInitEvent event) {
-        Config config = new Config(Loader.getInstance().getModContainerForModID(MODID));
+        @SuppressWarnings("ConstantConditions") Config config = new Config(Loader.getInstance().getModContainerForModID(MODID));
         ConfigCategory category = new ConfigCategory("General");
         category.addEntry(new BooleanConfigEntry("warnOnLoad", true, "Warn on load if mod-saved data could not be loaded"));
         config.addCategory(category);

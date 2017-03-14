@@ -47,6 +47,7 @@ public class ModListGui implements ListSelectionListener {
         dialog.add(configPanel);
         dialog.setModal(true);
         dialog.pack();
+        //noinspection ConstantConditions,ConstantConditions
         dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY());
     }
 
