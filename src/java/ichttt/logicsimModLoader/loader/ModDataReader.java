@@ -71,7 +71,7 @@ class ModDataReader {
                 }
             }
 
-            if (!hexString.toString().equals(line.substring(SHA_STRING.length()))) {
+            if (!hexString.toString().equalsIgnoreCase(line.substring(SHA_STRING.length()))) {
                 LSMLLog.error("Stopping loading because of mismatching SHAString", jarFile);
                 LSMLLog.error("File has String %s while modinfo wants %s", hexString.toString().toUpperCase(), line.substring(SHA_STRING.length()).toUpperCase());
                 throw new SecurityException("Cannot continue loading because of security concerns.");

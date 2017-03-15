@@ -1,5 +1,7 @@
 package logicsim;
 
+import ichttt.logicsimModLoader.event.LSMLEventBus;
+import ichttt.logicsimModLoader.event.SaveEventBase;
 import ichttt.logicsimModLoader.internal.LSMLHooks;
 
 import java.awt.*;
@@ -512,7 +514,9 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             sim.stop();
             jToggleButton_simulate.setSelected(false);
         }
-        
+
+        LSMLEventBus.EVENT_BUS.post(new SaveEventBase.LoadEvent(new File(fileName))); //LSML: fire event
+
         try {
             ObjectInputStream s = new ObjectInputStream(new FileInputStream(new File(fileName)));
             lspanel.gates = (GateList)s.readObject();
@@ -545,9 +549,11 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             return;
         }
         
-        if (fileName==null || fileName.length()==0 || fileName=="." || fileName=="./circuits/")
+        if (fileName==null || fileName.length()==0 || fileName.equals(".") || fileName.equals("./circuits/")) //LSML: fix String compare with ==
             if (showSaveDialog()==false) return;
-        
+
+        LSMLEventBus.EVENT_BUS.post(new SaveEventBase.SaveEvent(new File(fileName))); //LSML: Fire
+
         try {
             ObjectOutput s = new ObjectOutputStream(new FileOutputStream(new File(fileName)));
             s.writeObject(lspanel.gates);
