@@ -2,6 +2,7 @@ package ichttt.logicsimModLoader.gui;
 
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
+import logicsim.App;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -33,7 +34,7 @@ public class ModListGui implements ListSelectionListener {
     }
 
     private ModListGui() {
-        dialog = new JDialog();
+        dialog = new JDialog(LogicSimModLoader.getApp().frame);
         JList<String> containerJList = new JList<>();
         DefaultListModel<String> listModel = new DefaultListModel<>();
         modInterfacesMap.keySet().forEach((Mod mod) -> listModel.addElement(mod.modName()));
@@ -47,7 +48,7 @@ public class ModListGui implements ListSelectionListener {
         dialog.add(configPanel);
         dialog.setModal(true);
         dialog.pack();
-        //noinspection ConstantConditions,ConstantConditions
+        //noinspection ConstantConditions
         dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY());
     }
 

@@ -5,6 +5,7 @@ import ichttt.logicsimModLoader.api.ISaveHandler;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.event.SaveEventBase;
 import ichttt.logicsimModLoader.exceptions.ModException;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.swing.*;
@@ -163,7 +164,7 @@ public class SaveHandler {
             return;
         }
         Mod faultyMod = LSMLUtil.getActiveModFromCurrentThread();
-        if (faultyMod != null)
+        if (faultyMod != null && !LogicSimModLoader.isInDev())
             throw new ModException(faultyMod, "A mod tried closing the registration window. THIS IS NOT ALLOWED!");
         registrationAllowed = false;
         if (!saveHandlers.isEmpty()) {

@@ -88,7 +88,7 @@ public class LSMLUtil {
     public static void showMessageDialogOnWindowIfAvailable(String message) {
         App app = LogicSimModLoader.getApp();
         if (app != null)
-            JOptionPane.showMessageDialog(app.lsframe, message);
+            JOptionPane.showMessageDialog(app.frame, message);
         else
             JOptionPane.showMessageDialog(null, message);
     }
@@ -100,7 +100,7 @@ public class LSMLUtil {
     public static void showMessageDialogOnWindowIfAvailable(String message, String title, int messageType) {
         App app = LogicSimModLoader.getApp();
         if (app != null)
-            JOptionPane.showMessageDialog(app.lsframe, message, title, messageType);
+            JOptionPane.showMessageDialog(app.frame, message, title, messageType);
         else
             JOptionPane.showMessageDialog(null, message, title, messageType);
     }

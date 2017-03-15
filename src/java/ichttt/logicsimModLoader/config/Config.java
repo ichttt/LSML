@@ -6,6 +6,7 @@ import ichttt.logicsimModLoader.config.entry.ConfigEntryBase;
 import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.exceptions.MalformedConfigException;
 import ichttt.logicsimModLoader.exceptions.ModException;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
@@ -188,7 +189,7 @@ public class Config extends ConfigElement {
             return;
         }
         Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        if (mod != null)
+        if (mod != null && !LogicSimModLoader.isInDev())
             throw new ModException(mod, "A mod tried closing the registration window. THIS IS NOT ALLOWED!");
         registrationAllowed = false;
     }

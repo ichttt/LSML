@@ -63,4 +63,12 @@ public class VersionBase {
             return true;
         throw new RuntimeException("You missed a case O.o");
     }
+
+    /**
+     * @since 0.0.2
+     */
+    @Override
+    public String toString() {
+        return getVersionString();
+    }
 }

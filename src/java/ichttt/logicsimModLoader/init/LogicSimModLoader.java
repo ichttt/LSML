@@ -7,11 +7,13 @@ import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.event.loading.LSMLPostInitEvent;
 import ichttt.logicsimModLoader.event.loading.LSMLPreInitEvent;
 import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
+import ichttt.logicsimModLoader.exceptions.MissingDependencyException;
 import ichttt.logicsimModLoader.internal.LSMLInternalMod;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.util.LSMLUtil;
 import logicsim.App;
 
 import javax.annotation.Nullable;
@@ -24,7 +26,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final VersionBase LSML_VERSION = new VersionBase(0,0,1);
+    public static final VersionBase LSML_VERSION = new VersionBase(0,0,2);
     private static boolean hasInit = false;
     private static boolean isDev = false;
 
@@ -105,10 +107,12 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        LSMLLog.error("----------REPORTING EXCEPTION THROWN----------");
-        LSMLLog.log("An exception occured and LSML could not continue working!", Level.SEVERE, e);
-        JInternalFrame frame  = getApp() == null ? null : getApp().lsframe;
-            JOptionPane.showMessageDialog(frame, "There was an unexpected error and LSML could not continue. Futher information can be found in the log" , "Exception in app", JOptionPane.ERROR_MESSAGE);
+        LSMLLog.log("----------REPORTING EXCEPTION THROWN----------", Level.SEVERE, e);
+        if (e instanceof MissingDependencyException) {
+            LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not continue because some mods are missing dependencies\n" + e.getMessage());
+        } else {
+            LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
+        }
         System.exit(-1);
     }
 }

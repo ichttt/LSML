@@ -11,12 +11,13 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 public class App {
     
-    public LSFrame lsframe; //LSML: make public
+    public final LSFrame lsframe; //LSML: make public and final
+    public transient final JFrame frame; //LSML: create
     
     /**Construct the application*/
     public App() {
         new I18N();
-        JFrame frame = new MyFrame();
+        frame = new MyFrame(); //LSML: reroute to field
         lsframe = new LSFrame(frame);
         ((BasicInternalFrameUI) lsframe.getUI()).setNorthPane(null);
         lsframe.setBorder(null);
