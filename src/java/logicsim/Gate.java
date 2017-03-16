@@ -1,6 +1,6 @@
 package logicsim;
 
-import ichttt.logicsimModLoader.event.GateConstructionEvent;
+import ichttt.logicsimModLoader.event.GateEvent;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 
 import java.awt.*;
@@ -56,7 +56,7 @@ public abstract class Gate implements Serializable {
     for (int i=0; i<16; i++)
       in.addElement(null);
     active=true;
-    LSMLEventBus.EVENT_BUS.post(new GateConstructionEvent(this)); //LSML: Fire GateConstructionEvent
+    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateConstructionEvent(this)); //LSML: Fire GateConstructionEvent
   }
   public Gate(Wire w) {
     this();
@@ -172,6 +172,7 @@ public abstract class Gate implements Serializable {
 
   public void draw(Graphics g) {
     if (gateimage==null) loadImage(); // wenn Image noch nicht geladen wurde, wird es hier geladen, z.b. wenn dieses Gatter deserialisiert wurde
+    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateDrawEvent(this)); //LSML: fire
 
     g.setColor(Color.black);
     g.drawImage(gateimage, x+3, y, null);

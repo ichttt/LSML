@@ -515,8 +515,6 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             jToggleButton_simulate.setSelected(false);
         }
 
-        LSMLEventBus.EVENT_BUS.post(new SaveEventBase.LoadEvent(new File(fileName))); //LSML: fire event
-
         try {
             ObjectInputStream s = new ObjectInputStream(new FileInputStream(new File(fileName)));
             lspanel.gates = (GateList)s.readObject();
@@ -530,12 +528,14 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         } catch (ClassNotFoundException x) {
             showMessage(I18N.getString("ERROR_CLASS"));
         }
-        
+
         if (window!=null) {
             window.setTitle("LogicSim - " + new File(fileName).getName());
         }
         
         lspanel.gates.reconnect();
+
+        LSMLEventBus.EVENT_BUS.post(new SaveEventBase.LoadEvent(new File(fileName))); //LSML: fire event
         
         lspanel.repaint();
         lspanel.changed=false;
