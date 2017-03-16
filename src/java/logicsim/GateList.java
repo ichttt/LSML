@@ -1,5 +1,8 @@
 package logicsim;
 
+import ichttt.logicsimModLoader.event.GateEvent;
+import ichttt.logicsimModLoader.event.LSMLEventBus;
+
 import java.util.*;
 import java.io.*;
 
@@ -34,6 +37,7 @@ public class GateList implements Serializable {
   }
 
   public void remove(int n) {
+    Gate currentGate = gates.get(n); //LSML cache for use in event
     gates.remove(n);
 
     /* Wire Objekte suchen und l�schen, die an ein Gate angeschlossen sind, dass
@@ -47,6 +51,7 @@ public class GateList implements Serializable {
       }
     }
 
+    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateDeleteEvent(currentGate)); //LSML: fire
   }
 
   public Gate get(int n) {

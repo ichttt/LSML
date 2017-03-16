@@ -28,9 +28,20 @@ public abstract class GateEvent {
 
     /**
      * Called when a {@link Gate} is redrawn
+     * @since 0.0.2
      */
     public static class GateDrawEvent extends GateEvent {
         public GateDrawEvent(Gate gate) {
+            super(gate);
+        }
+    }
+
+    /**
+     * Called when a {@link Gate} was deleted
+     * @since 0.0.3
+     */
+    public static class GateDeleteEvent extends GateEvent {
+        public GateDeleteEvent(Gate gate) {
             super(gate);
         }
     }

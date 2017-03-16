@@ -35,10 +35,12 @@ public class ConfigCategory extends ConfigElement {
      * @since 0.0.1
      */
     public void addEntry(ConfigEntryBase entry) {
+        ArrayList<ConfigEntryBase> toRemove = new ArrayList<>();
         for (ConfigEntryBase entryBase : configEntrys) {
             if (entryBase.key.equals(entry.key))
-                return;
+                toRemove.add(entryBase);
         }
+        configEntrys.removeAll(toRemove);
         configEntrys.add(entry);
     }
 

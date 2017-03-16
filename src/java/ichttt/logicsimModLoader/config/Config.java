@@ -118,6 +118,7 @@ public class Config extends ConfigElement {
                     if (currentCategory == null)
                         throw new MalformedConfigException("Current Category is not set but values are present!");
                     foundParser.parseActualLine(line, commentLines, currentCategory);
+                    commentLines.clear();
                     foundParser = null;
                     continue;
                 }
