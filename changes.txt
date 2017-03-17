@@ -1,8 +1,25 @@
 LSML changelog
 
+0.0.3:
+ADDED:
+new GateDeleteEvent
+
+FIXED:
+some config issues
+
 0.0.2:
+ADDED:
 Mods can be validated via SHA1String=[string] in their modinfo file
 new GateConstructionEvent
+new SaveLoad and SaveSaveEvent
+new SaveHandler for basic stuff. Your SaveHandler *must* be registered while loading.
+new Util-function "showMessageDialogOnWindowIfAvailable"
+CHANGED:
+A warning will be logged if some mod registers a custom config parser after the registeration event
+FIXED:
+Duplicate modid check
+
+
 
 
 0.0.1: initial release
