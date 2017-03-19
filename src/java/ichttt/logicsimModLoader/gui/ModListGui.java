@@ -35,6 +35,7 @@ public class ModListGui implements ListSelectionListener {
 
     private ModListGui() {
         dialog = new JDialog(LogicSimModLoader.getApp().frame);
+        dialog.setTitle("Mod Options");
         JList<String> containerJList = new JList<>();
         DefaultListModel<String> listModel = new DefaultListModel<>();
         modInterfacesMap.keySet().forEach((Mod mod) -> listModel.addElement(mod.modName()));

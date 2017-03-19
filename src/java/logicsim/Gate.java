@@ -43,7 +43,7 @@ public abstract class Gate implements Serializable {
   public int x;
   public int y;
 
-  transient boolean active;
+  public transient boolean active; //LSML: public
 
 
   public final Vector<Wire> in;  // enth�lt f�r jeden Eingang ein Wire Objekt //LSML: make public and final, use Generics
