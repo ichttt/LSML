@@ -210,8 +210,14 @@ public class Config extends ConfigElement {
             else
                 LSMLLog.warning("A config parser from is registered late!");
         }
-        if (!entryParsers.contains(parser)) //TODO if not singleton, this may not catch a duplicate!
+        final boolean[] duplicateParser = new boolean[1];
+        entryParsers.forEach(parser1 -> {
+            if (parser1.getClass().equals(parser.getClass()))
+                duplicateParser[0] = true;
+        });
+        if (!entryParsers.contains(parser) &&  !duplicateParser[0]) {
             entryParsers.add(parser);
+        }
         else
             LSMLLog.warning("Tried registering the same ConfigEntryParsers (%s) twice!", parser.getClass().getName());
     }

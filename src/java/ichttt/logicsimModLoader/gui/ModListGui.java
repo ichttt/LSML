@@ -8,10 +8,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @since 0.0.1
@@ -22,8 +20,8 @@ public class ModListGui implements ListSelectionListener {
     private JSplitPane configPanel;
     private JDialog dialog;
     private JPanel left;
-    private static final List<IModGuiInterface> modInterfaces = new ArrayList<>();
-    private static final Map<Mod, IModGuiInterface> modInterfacesMap = new HashMap<>();
+    private static final List<String> modids = new ArrayList<>();
+    private static final List<IModGuiInterface> modGuiInterfaces = new ArrayList<>();
 
     private static ModListGui INSTANCE = null;
 
@@ -39,12 +37,12 @@ public class ModListGui implements ListSelectionListener {
         dialog.setTitle("Mod Options");
         JList<String> containerJList = new JList<>();
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        modInterfacesMap.keySet().forEach((Mod mod) -> listModel.addElement(mod.modName()));
-        modInterfaces.forEach(IModGuiInterface::setup);
+        modids.forEach(listModel::addElement);
+        modGuiInterfaces.forEach(IModGuiInterface::setup);
         containerJList.setModel(listModel);
         containerJList.addListSelectionListener(this);
         left = new JPanel();
-        configPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, modInterfaces.get(0).draw());
+        configPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, modGuiInterfaces.get(0).draw());
         left.add(containerJList);
         dialog.add(configPanel);
         dialog.setModal(true);
@@ -58,7 +56,7 @@ public class ModListGui implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() instanceof JList) {
             JList list = (JList) e.getSource();
-            IModGuiInterface guiInterface = modInterfaces.get(list.getSelectedIndex());
+            IModGuiInterface guiInterface = modGuiInterfaces.get(list.getSelectedIndex());
             configPanel.setRightComponent(guiInterface.draw());
             dialog.repaint();
             dialog.printAll(dialog.getGraphics());
@@ -72,7 +70,7 @@ public class ModListGui implements ListSelectionListener {
      * @since 0.0.1
      */
     public static void registerModGui(Mod mod, IModGuiInterface guiInterface) {
-        modInterfaces.add(guiInterface); //TODO Ugly hack
-        modInterfacesMap.put(mod, guiInterface);
+        modids.add(mod.modid());
+        modGuiInterfaces.add(guiInterface);
     }
 }

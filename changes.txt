@@ -24,8 +24,6 @@ FIXED:
 Duplicate modid check
 
 
-
-
 0.0.1: initial release
 
 ============================

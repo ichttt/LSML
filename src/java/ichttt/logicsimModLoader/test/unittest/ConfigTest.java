@@ -3,14 +3,18 @@ package ichttt.logicsimModLoader.test.unittest;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.ConfigCategory;
 import ichttt.logicsimModLoader.config.entry.BooleanConfigEntry;
+import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.config.entry.IntConfigEntry;
 import ichttt.logicsimModLoader.config.entry.StringConfigEntry;
+import ichttt.logicsimModLoader.exceptions.MalformedConfigException;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Created by Tobias on 05.03.2017.
@@ -49,6 +53,33 @@ public class ConfigTest {
         //Cleanup
         configFile.delete();
         configFile2.delete();
+    }
+
+    @Test()
+    public void testDuplicateParsers() throws Exception {
+        Field f =  Config.class.getDeclaredField("entryParsers");
+        f.setAccessible(true);
+        //noinspection unchecked
+        List<IConfigEntryParser> parsers = (List<IConfigEntryParser>) f.get(null);
+        parsers.clear();
+        Config.registerCustomEntryParser(new DuplicateParser());
+        Config.registerCustomEntryParser(new DuplicateParser());
+        Config.registerCustomEntryParser(new LegitParser());
+        Assert.assertTrue(parsers.size() == 2);
+    }
+
+    private static class DuplicateParser implements IConfigEntryParser {
+        @Override
+        public boolean parseCommentLine(String line) {return false;}
+        @Override
+        public void parseActualLine(String line, List<String> comments, ConfigCategory currentCategory) throws MalformedConfigException {}
+    }
+
+    private static class LegitParser implements IConfigEntryParser {
+        @Override
+        public boolean parseCommentLine(String line) {return false;}
+        @Override
+        public void parseActualLine(String line, List<String> comments, ConfigCategory currentCategory) throws MalformedConfigException {}
     }
 
     //Taken from Apache IOCommons, simplified
