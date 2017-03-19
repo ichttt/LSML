@@ -4,8 +4,12 @@ LSML changelog
 ADDED:
 new GateDeleteEvent
 
+CHANGED:
+made "active" field public in Gata.java
+
 FIXED:
 some config issues
+some small ModListGui improvements
 
 0.0.2:
 ADDED:

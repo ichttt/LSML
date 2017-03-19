@@ -7,6 +7,7 @@ import logicsim.App;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,13 +45,13 @@ public class ModListGui implements ListSelectionListener {
         containerJList.addListSelectionListener(this);
         left = new JPanel();
         configPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, modInterfaces.get(0).draw());
-        configPanel.setDividerLocation(JSplitPane.HORIZONTAL_SPLIT);
         left.add(containerJList);
         dialog.add(configPanel);
         dialog.setModal(true);
+        dialog.setMinimumSize(new Dimension(600, 400));
         dialog.pack();
         //noinspection ConstantConditions
-        dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY());
+        dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY()); //FIXME
     }
 
     @Override
