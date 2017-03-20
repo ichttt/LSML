@@ -11,10 +11,7 @@ import ichttt.logicsimModLoader.util.LSMLUtil;
 import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -32,9 +29,10 @@ public class SaveHandler {
     public static final String REV_STRING = "LSMLREV" + CURRENT_REV;
     public static final String MOD_START = "modStart";
     public static final String MOD_END = "modEnd";
+    private static final String SPLITTER = ",";
 
     private static void saveFile(File ourFile) throws IOException {
-        if (!ourFile.createNewFile())
+        if (!ourFile.exists() && !ourFile.createNewFile())
             throw new IOException(String.format("Could not create new file %s!", ourFile));
         //Create header
         BufferedWriter bf = new BufferedWriter(new FileWriter(ourFile));
@@ -109,9 +107,11 @@ public class SaveHandler {
             br = new BufferedReader(new FileReader(ourFile));
             String line1 = br.readLine();
             String line2 = br.readLine();
-
-            return line1.equals(REV_STRING) && line2.equals(mods);
+            String[] modsSaved = line2.split(SPLITTER);
+            return (line1.equals(REV_STRING) && Arrays.stream(modsSaved).
+                    allMatch(s -> saveHandlers.keySet().contains(s)));
         } catch (IOException e) {
+            LSMLLog.log("Error while reading file header!", Level.SEVERE, e);
             return false;
         } finally {
             LSMLUtil.closeSilent(br);
@@ -133,17 +133,19 @@ public class SaveHandler {
 
     @Subscribe
     public void onLoad(SaveEventBase.LoadEvent event) {
-        if (saveHandlers.isEmpty()) //NO-OP when nothing is registered
-            return;
         try {
             File ourFile = new File(event.saveFile.getPath() + ".lsml");
             if (ourFile.exists()) {
                 LSMLLog.fine("Trying loading additional save data for file %s", event.saveFile);
                 if (!verifyFileHeader(ourFile)) {
                     LSMLLog.warning("Could not verify header");
+                    JOptionPane.showMessageDialog(LogicSimModLoader.getApp().frame, "The file you are trying to load has mod specific data saved." +
+                            "If you want to be safe, exit the save without saving anything.\nA Backup of the mod data will be created, but if you modify anything, this might be of no use."
+                            , "Missing mods", JOptionPane.WARNING_MESSAGE);
                     Files.copy(ourFile.toPath(), new File(ourFile.getPath() + ".bak").toPath());
-                    LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not mod file header verify header. A backup has been created", "Waring", JOptionPane.WARNING_MESSAGE);
                 }
+                if (saveHandlers.isEmpty()) //Only check header when nothing is registered
+                    return;
                 loadFile(ourFile);
             } else {
                 LSMLLog.fine("No additional save data found for file %s", event.saveFile);
@@ -169,7 +171,7 @@ public class SaveHandler {
         registrationAllowed = false;
         if (!saveHandlers.isEmpty()) {
             StringBuilder writerList = new StringBuilder();
-            saveHandlers.keySet().forEach((String s) -> writerList.append(s).append(","));
+            saveHandlers.keySet().forEach((String s) -> writerList.append(s).append(SPLITTER));
             String s = writerList.toString();
             mods = s.substring(0, s.length() - 1);
         }
