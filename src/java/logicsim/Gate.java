@@ -80,6 +80,7 @@ public abstract class Gate implements Serializable {
 
   public final void activate() {
     active=true;
+    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateSelectionEvent(this)); //LSML: post
   }
   public final void deactivate() {
     active=false;

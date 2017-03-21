@@ -26,7 +26,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final VersionBase LSML_VERSION = new VersionBase(0,0,3);
+    public static final VersionBase LSML_VERSION = new VersionBase(0,0,4);
     private static boolean hasInit = false;
     private static boolean isDev = false;
 
@@ -57,6 +57,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         if (hasInit)
             return;
         Thread.setDefaultUncaughtExceptionHandler(new LogicSimModLoader());
+        ProgressBarManager.init(); //init the progress bar
         Loader loader = Loader.getInstance(); //init loader to load libs
         coreInit();
         //Init our mod first
@@ -66,18 +67,23 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         catch (Exception e) {
             LSMLLog.warning("Could not load internal LSMLMod!");
         }
+        ProgressBarManager.stepBar("Searching mods...");
         loader.searchMods();
-
+        ProgressBarManager.stepBar("Registering mod hooks...");
         LSMLEventBus.EVENT_BUS.post(new LSMLRegistrationEvent());
         //Close registration window for CustomConfigLoaders
         Config.closeRegistrationWindow();
+        ProgressBarManager.stepBar("Sending PreInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPreInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.PREINIT);
         app = new App(); // This starts LogicSim
+        ProgressBarManager.stepBar("Sending PostInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.POSTINIT);
         //Close registration window for CustomSaves
         SaveHandler.closeRegistrationWindow();
+        ProgressBarManager.destroyWindow();
+        app.frame.setVisible(true);
     }
 
     /**
@@ -99,6 +105,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
     /**
      * Gets the app singleton from LogicSim
      * @return the singleton or null if not yet init
+     * @since 0.0.1
      */
     @Nullable
     public static App getApp() {

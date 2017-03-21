@@ -47,7 +47,7 @@ public class App {
         lsframe.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         frame.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         lsframe.setVisible(true);
-        frame.setVisible(true);
+//        frame.setVisible(true); LSML: NOPE, called later
         
     }
     

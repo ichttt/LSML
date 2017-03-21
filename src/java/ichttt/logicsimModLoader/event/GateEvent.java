@@ -45,4 +45,15 @@ public abstract class GateEvent {
             super(gate);
         }
     }
+
+
+    /**
+     * Called when a {@link Gate} has been selected
+     * @since 0.0.4
+     */
+    public static class GateSelectionEvent extends GateEvent {
+        public GateSelectionEvent(Gate gate) {
+            super(gate);
+        }
+    }
 }
