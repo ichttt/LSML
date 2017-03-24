@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @since 0.0.1
@@ -36,9 +35,20 @@ public class ConfigCategory extends ConfigElement {
      * @since 0.0.1
      */
     public void addEntry(ConfigEntryBase entry) {
-        ArrayList<ConfigEntryBase> toRemove = configEntrys.stream().
-                filter(entryBase -> entryBase.key.equals(entry.key)).
-                collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<ConfigEntryBase> toRemove = new ArrayList<>();
+        for (ConfigEntryBase entryBase : configEntrys) {
+            if (entryBase.key.equals(entry.key)) {
+                try {
+                    //noinspection unchecked
+                    entryBase.setValue(entry.getValue());
+                    return;
+                } catch (Exception e) {
+                    //Just fall back to the old behavior
+                    toRemove.add(entryBase);
+                    break; //Should only find one
+                }
+            }
+        }
         configEntrys.removeAll(toRemove);
         configEntrys.add(entry);
     }
@@ -49,6 +59,7 @@ public class ConfigCategory extends ConfigElement {
      * @return The entry or null if not found
      * @since 0.0.1
      */
+    @Nullable
     public ConfigEntryBase getConfigEntry(String key) {
         return configEntrys.stream().
                 filter(configEntry -> configEntry.key.equals(key)).

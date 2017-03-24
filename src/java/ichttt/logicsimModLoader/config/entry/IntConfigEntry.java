@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @since 0.0.1
  */
-public class IntConfigEntry extends ConfigEntryBase {
+public class IntConfigEntry extends ConfigEntryBase<Integer> {
     public int value;
 
     /**
@@ -31,5 +31,16 @@ public class IntConfigEntry extends ConfigEntryBase {
         List<String> lines = super.generateLines();
         lines.add(String.format("\"%s\" = %s", key, value));
         return lines;
+    }
+
+    @Override
+    public void setValue(Integer data) throws UnsupportedOperationException {
+        value = data;
+    }
+
+    @Nonnull
+    @Override
+    public Integer getValue() throws UnsupportedOperationException {
+        return value;
     }
 }

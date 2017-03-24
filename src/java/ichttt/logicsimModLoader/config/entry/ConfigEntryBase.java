@@ -11,8 +11,9 @@ import java.util.stream.Collectors;
  * Extend this if you want to define custom config fields
  * <br><b>Be sure to also register a {@link IConfigEntryParser} when extending this </b>
  * @since 0.0.1
+ * @param <T> The type for {@link #setValue(Object)} and {@link #getValue()}, available since v0.1.1
  */
-public abstract class ConfigEntryBase extends ConfigElement {
+public abstract class ConfigEntryBase<T> extends ConfigElement {
     public final String key, postComment;
     private final List<String> comment;
     public static final String POST_COMMENT = "Allowed values: ";
@@ -46,5 +47,30 @@ public abstract class ConfigEntryBase extends ConfigElement {
                 collect(Collectors.toList());
         lines.add("* " + postComment);
         return lines;
+    }
+
+    /**
+     * Sets the value. If this fails due to a {@link UnsupportedOperationException}, a new ConfigEntry might be created,
+     * deleting any reference that was made.
+     * ConfigEntry authors: Override this if you target 0.1.1+!
+     * @param data the value
+     * @since 0.1.1
+     * @throws UnsupportedOperationException if the configEntry does not support swapping the value this way
+     */
+    public void setValue(T data) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Could not set ConfigEntry value!");
+    }
+
+    /**
+     * Sets the value. If this fails due to a {@link UnsupportedOperationException}, a new ConfigEntry might be created,
+     * deleting any reference that was made.
+     * ConfigEntry authors: Override this if you target 0.1.1+!
+     * @since 0.1.1
+     * @return The value
+     * @throws UnsupportedOperationException if the configEntry does not support swapping the value this way
+     */
+    @Nonnull
+    public T getValue() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Could not load ConfigEntry value!");
     }
 }

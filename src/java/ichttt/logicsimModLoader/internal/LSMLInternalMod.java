@@ -28,9 +28,8 @@ import java.util.logging.Level;
 @Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING)
 public class LSMLInternalMod implements IModGuiInterface {
     public static final String MODID = "LSML";
-    private JList<String> mods;
-    private DefaultListModel<String> modsList;
     private JPanel panel;
+    private BooleanConfigEntry warnOnSave;
 
     @Subscribe
     public void register(LSMLRegistrationEvent event) {
@@ -46,7 +45,8 @@ public class LSMLInternalMod implements IModGuiInterface {
     public void onPreInit(LSMLPreInitEvent event) {
         @SuppressWarnings("ConstantConditions") Config config = new Config(Loader.getInstance().getModContainerForModID(MODID));
         ConfigCategory category = new ConfigCategory("General");
-        category.addEntry(new BooleanConfigEntry("warnOnLoad", true, "Warn on load if mod-saved data could not be loaded"));
+        warnOnSave = new BooleanConfigEntry("warnOnLoad", true, "Warn on load if mod-saved data could not be loaded");
+        category.addEntry(warnOnSave);
         config.addCategory(category);
         config.load();
         config.save();
@@ -54,8 +54,8 @@ public class LSMLInternalMod implements IModGuiInterface {
 
     @Override
     public void setup() {
-        mods = new JList<>();
-        modsList = new DefaultListModel<>();
+        JList<String> mods = new JList<>();
+        DefaultListModel<String> modsList = new DefaultListModel<>();
         GridBagConstraints layout = new GridBagConstraints();
         for (ModContainer modContainer : Loader.getInstance().getMods())
             modsList.addElement(String.format("%s v.%s (modid %s)", modContainer.mod.modName(), modContainer.VERSION.getVersionString(), modContainer.mod.modid()));

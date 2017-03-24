@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @since 0.0.1
  */
-public class BooleanConfigEntry extends ConfigEntryBase {
+public class BooleanConfigEntry extends ConfigEntryBase<Boolean> {
     public boolean value;
     /**
      * @since 0.0.1
@@ -32,4 +32,14 @@ public class BooleanConfigEntry extends ConfigEntryBase {
         return lines;
     }
 
+    @Override
+    public void setValue(Boolean data) throws UnsupportedOperationException {
+       value = data;
+    }
+
+    @Nonnull
+    @Override
+    public Boolean getValue() throws UnsupportedOperationException {
+        return value;
+    }
 }
