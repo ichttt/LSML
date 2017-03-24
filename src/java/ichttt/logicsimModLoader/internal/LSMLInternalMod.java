@@ -36,7 +36,7 @@ public class LSMLInternalMod implements IModGuiInterface {
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
         try {
-            event.checkForUpdate(Loader.getInstance().getModContainerForModID(MODID), new URL("https://gist.githubusercontent.com/ichttt/2f1121e3b02f63a6eb4cca91a2082e75/raw/e0f653adb970e9809d476984830b259ebe9c4dcb/gistfile1.txt"));
+            event.checkForUpdate(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt"));
         } catch (MalformedURLException e) {
             LSMLLog.log("What just happened?", Level.SEVERE, e);
         }
