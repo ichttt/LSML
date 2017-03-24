@@ -1,14 +1,19 @@
 package ichttt.logicsimModLoader.event.loading;
 
 import com.google.common.base.Preconditions;
+import ichttt.logicsimModLoader.UpdateChecker;
 import ichttt.logicsimModLoader.api.ISaveHandler;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.gui.ModListGui;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
+import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
+import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.util.LSMLUtil;
+
+import java.net.URL;
 
 /**
  * Called before anything else
@@ -54,5 +59,24 @@ public class LSMLRegistrationEvent {
 
     public void registerSaveHandler(Mod yourMod, ISaveHandler handler) {
         SaveHandler.registerSaveHandler(yourMod, handler);
+    }
+
+    /**
+     * @since 0.0.4
+     */
+    @Deprecated
+    public void checkForUpdate(URL updateURL) {
+        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
+        Preconditions.checkNotNull(mod, "Failed to get ModContainer!");
+        checkForUpdate(Loader.getInstance().getModContainerForModID(mod.modid()), updateURL);
+    }
+
+    /**
+     * @since 0.0.4
+     */
+    public void checkForUpdate(ModContainer yourMod, URL updateURL) {
+        Preconditions.checkNotNull(yourMod);
+        Preconditions.checkNotNull(updateURL);
+        UpdateChecker.register(yourMod, updateURL);
     }
 }

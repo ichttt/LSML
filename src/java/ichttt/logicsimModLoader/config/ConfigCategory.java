@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @since 0.0.1
@@ -35,11 +36,9 @@ public class ConfigCategory extends ConfigElement {
      * @since 0.0.1
      */
     public void addEntry(ConfigEntryBase entry) {
-        ArrayList<ConfigEntryBase> toRemove = new ArrayList<>();
-        for (ConfigEntryBase entryBase : configEntrys) {
-            if (entryBase.key.equals(entry.key))
-                toRemove.add(entryBase);
-        }
+        ArrayList<ConfigEntryBase> toRemove = configEntrys.stream().
+                filter(entryBase -> entryBase.key.equals(entry.key)).
+                collect(Collectors.toCollection(ArrayList::new));
         configEntrys.removeAll(toRemove);
         configEntrys.add(entry);
     }

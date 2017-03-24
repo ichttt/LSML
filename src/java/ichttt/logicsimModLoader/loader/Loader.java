@@ -186,7 +186,7 @@ public class Loader {
      * @param clazz The class implementing @Mod
      * @since 0.0.1
      */
-    public void addMod(Class clazz) throws IllegalAccessException, InstantiationException {
+    public void addMod(Class clazz) {
         addMod(clazz, new ModContainer((Mod) clazz.getAnnotation(Mod.class)));
     }
 

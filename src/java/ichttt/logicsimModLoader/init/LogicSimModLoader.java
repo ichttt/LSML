@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.init;
 
 import ichttt.logicsimModLoader.ModState;
+import ichttt.logicsimModLoader.UpdateChecker;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
@@ -26,7 +27,8 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final VersionBase LSML_VERSION = new VersionBase(0,0,4);
+    public static final String LSML_VERSION_STRING = "0.1.0";
+    public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
 
@@ -73,6 +75,12 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         LSMLEventBus.EVENT_BUS.post(new LSMLRegistrationEvent());
         //Close registration window for CustomConfigLoaders
         Config.closeRegistrationWindow();
+
+        Thread thread = new Thread(new UpdateChecker());
+        thread.setName("UpdateCheckerThread");
+        thread.setDaemon(true);
+        thread.start();
+
         ProgressBarManager.stepBar("Sending PreInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPreInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.PREINIT);

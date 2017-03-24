@@ -8,12 +8,16 @@ import ichttt.logicsimModLoader.config.entry.BooleanConfigEntry;
 import ichttt.logicsimModLoader.event.loading.LSMLPreInitEvent;
 import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * Inter mod required for some LSML components.
@@ -21,7 +25,7 @@ import java.awt.*;
  * <br>Depend on {@link ichttt.logicsimModLoader.init.LogicSimModLoader#LSML_VERSION} instead.
  * Do not depend on any of these methods, they may change without a warning
  */
-@Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = "1.0.0")
+@Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING)
 public class LSMLInternalMod implements IModGuiInterface {
     public static final String MODID = "LSML";
     private JList<String> mods;
@@ -31,6 +35,11 @@ public class LSMLInternalMod implements IModGuiInterface {
     @Subscribe
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
+        try {
+            event.checkForUpdate(Loader.getInstance().getModContainerForModID(MODID), new URL("https://gist.githubusercontent.com/ichttt/2f1121e3b02f63a6eb4cca91a2082e75/raw/e0f653adb970e9809d476984830b259ebe9c4dcb/gistfile1.txt"));
+        } catch (MalformedURLException e) {
+            LSMLLog.log("What just happened?", Level.SEVERE, e);
+        }
     }
 
     @Subscribe
@@ -49,7 +58,7 @@ public class LSMLInternalMod implements IModGuiInterface {
         modsList = new DefaultListModel<>();
         GridBagConstraints layout = new GridBagConstraints();
         for (ModContainer modContainer : Loader.getInstance().getMods())
-            modsList.addElement(String.format("%s (modid %s)", modContainer.mod.modName(), modContainer.mod.modid()));
+            modsList.addElement(String.format("%s v.%s (modid %s)", modContainer.mod.modName(), modContainer.VERSION.getVersionString(), modContainer.mod.modid()));
         mods.setModel(modsList);
         panel = new JPanel(new GridBagLayout());
         layout.gridy = 1;

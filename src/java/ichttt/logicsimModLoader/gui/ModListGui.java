@@ -2,7 +2,6 @@ package ichttt.logicsimModLoader.gui;
 
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
-import logicsim.App;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
