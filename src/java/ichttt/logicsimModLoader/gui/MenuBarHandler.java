@@ -4,7 +4,6 @@ import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.util.LSMLUtil;
-import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

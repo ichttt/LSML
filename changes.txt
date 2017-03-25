@@ -1,5 +1,13 @@
 LSML changelog
 
+0.1.1
+ADDED:
+Button to do manuel update checking
+
+CHANGED:
+References to config becoming no longer will be invalid if the ConfigParser supports swapping
+Improved ModListGui, added a GuiConfig to LSML
+
 0.1.0:
 ADDED:
 Basic Update Checker

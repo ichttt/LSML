@@ -35,7 +35,7 @@ public class ConfigCategory extends ConfigElement {
      * @since 0.0.1
      */
     public void addEntry(ConfigEntryBase entry) {
-        ArrayList<ConfigEntryBase> toRemove = new ArrayList<>();
+        ConfigEntryBase toRemove = null;
         for (ConfigEntryBase entryBase : configEntrys) {
             if (entryBase.key.equals(entry.key)) {
                 try {
@@ -44,12 +44,13 @@ public class ConfigCategory extends ConfigElement {
                     return;
                 } catch (Exception e) {
                     //Just fall back to the old behavior
-                    toRemove.add(entryBase);
+                    toRemove= entryBase;
                     break; //Should only find one
                 }
             }
         }
-        configEntrys.removeAll(toRemove);
+        if (toRemove != null)
+            configEntrys.remove(toRemove);
         configEntrys.add(entry);
     }
 
