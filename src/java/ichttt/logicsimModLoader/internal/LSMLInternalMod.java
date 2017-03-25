@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.internal;
 
 import com.google.common.eventbus.Subscribe;
+import ichttt.logicsimModLoader.UpdateChecker;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.ConfigCategory;
@@ -14,9 +15,13 @@ import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -26,10 +31,12 @@ import java.util.logging.Level;
  * Do not depend on any of these methods, they may change without a warning
  */
 @Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING)
-public class LSMLInternalMod implements IModGuiInterface {
+public class LSMLInternalMod implements ActionListener, IModGuiInterface {
     public static final String MODID = "LSML";
-    private JPanel panel;
-    private BooleanConfigEntry warnOnSave;
+    private static Config config;
+    private static JPanel panel;
+    private static BooleanConfigEntry warnOnSave, checkForUpdates;
+    private static JCheckBox warnOnSaveBox, checkForUpdatesBox;
 
     @Subscribe
     public void register(LSMLRegistrationEvent event) {
@@ -43,10 +50,18 @@ public class LSMLInternalMod implements IModGuiInterface {
 
     @Subscribe
     public void onPreInit(LSMLPreInitEvent event) {
-        @SuppressWarnings("ConstantConditions") Config config = new Config(Loader.getInstance().getModContainerForModID(MODID));
+        config = new Config(Loader.getInstance().getModContainerForModID(MODID));
         ConfigCategory category = new ConfigCategory("General");
+
         warnOnSave = new BooleanConfigEntry("warnOnLoad", true, "Warn on load if mod-saved data could not be loaded");
         category.addEntry(warnOnSave);
+
+        List<String> lines = new ArrayList<>();
+        lines.add("Enable a lightweight update checker.");
+        lines.add("If an update is found, the user will be notified, but nothing will be downloaded.");
+        checkForUpdates = new BooleanConfigEntry("checkForUpdates", true, lines);
+        category.addEntry(checkForUpdates);
+
         config.addCategory(category);
         config.load();
         config.save();
@@ -54,32 +69,52 @@ public class LSMLInternalMod implements IModGuiInterface {
 
     @Override
     public void setup() {
-        JList<String> mods = new JList<>();
-        DefaultListModel<String> modsList = new DefaultListModel<>();
-        GridBagConstraints layout = new GridBagConstraints();
-        for (ModContainer modContainer : Loader.getInstance().getMods())
-            modsList.addElement(String.format("%s v.%s (modid %s)", modContainer.mod.modName(), modContainer.VERSION.getVersionString(), modContainer.mod.modid()));
-        mods.setModel(modsList);
-        panel = new JPanel(new GridBagLayout());
-        layout.gridy = 1;
-        layout.gridheight = 1;
-        layout.gridx = 1;
-        layout.weightx = 1.0;
-        layout.weighty = 0.1;
-        panel.add(new JLabel("Loaded mods:"), layout);
-        GridBagConstraints layout2 = new GridBagConstraints();
-        layout2.gridheight = 1;
-        layout2.gridx = 1;
-        layout2.weightx = 1.0;
-        layout2.weighty = 0.9;
-        layout2.gridheight = 2;
-        layout2.gridy = 2;
-        panel.add(mods, layout2);
+        panel = new JPanel(new GridLayout(0,1));
+        panel.add(new JLabel("LogicSimModLoader Settings"));
+
+        warnOnSaveBox = new JCheckBox("Warn on load if mod-saved data could not be loaded");
+        warnOnSaveBox.setSelected(warnOnSave.getValue());
+        warnOnSaveBox.addActionListener(this);
+        panel.add(warnOnSaveBox);
+
+        checkForUpdatesBox = new JCheckBox("Enable a lightweight update checker");
+        checkForUpdatesBox.setSelected(checkForUpdates.value);
+        checkForUpdatesBox.addActionListener(this);
+        panel.add(checkForUpdatesBox);
+
+        JButton searchUpdatesNow = new JButton("Search now!");
+        searchUpdatesNow.setActionCommand("searchNow");
+        searchUpdatesNow.addActionListener(this);
+        panel.add(searchUpdatesNow);
     }
 
     @Nonnull
     @Override
     public JPanel draw() {
         return panel;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        if (event.getActionCommand().equalsIgnoreCase("searchNow")) {
+            if (!UpdateChecker.isRunning()) {
+                Thread UPDATE_THREAD = new Thread(new UpdateChecker());
+                UPDATE_THREAD.setName("UpdateCheckerThread");
+                UPDATE_THREAD.setDaemon(true);
+                UPDATE_THREAD.start();
+            }
+            return;
+        }
+        warnOnSave.value = warnOnSaveBox.isSelected();
+        checkForUpdates.value = checkForUpdatesBox.isSelected();
+        config.save();
+    }
+
+    public static boolean checkForUpdates() {
+        return checkForUpdates.value;
+    }
+
+    public static boolean warnOnSave() {
+        return warnOnSave.value;
     }
 }

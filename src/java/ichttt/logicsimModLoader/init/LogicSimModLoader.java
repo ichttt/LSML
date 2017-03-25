@@ -27,7 +27,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.1.0";
+    public static final String LSML_VERSION_STRING = "0.1.1";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -75,15 +75,19 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         LSMLEventBus.EVENT_BUS.post(new LSMLRegistrationEvent());
         //Close registration window for CustomConfigLoaders
         Config.closeRegistrationWindow();
-
-        Thread thread = new Thread(new UpdateChecker());
-        thread.setName("UpdateCheckerThread");
-        thread.setDaemon(true);
-        thread.start();
-
         ProgressBarManager.stepBar("Sending PreInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPreInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.PREINIT);
+
+        if (LSMLInternalMod.checkForUpdates()) { //Need to do this here so the config is loaded
+            LSMLLog.info("Starting LSML update checker...");
+            Thread UPDATE_THREAD = new Thread(new UpdateChecker());
+            UPDATE_THREAD.setName("UpdateCheckerThread");
+            UPDATE_THREAD.setDaemon(true);
+            UPDATE_THREAD.start();
+        } else
+            LSMLLog.fine("Update checker is disabled");
+
         app = new App(); // This starts LogicSim
         ProgressBarManager.stepBar("Sending PostInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());

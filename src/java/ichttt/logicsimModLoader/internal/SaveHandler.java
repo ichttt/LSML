@@ -139,7 +139,8 @@ public class SaveHandler {
                 LSMLLog.fine("Trying loading additional save data for file %s", event.saveFile);
                 if (!verifyFileHeader(ourFile)) {
                     LSMLLog.warning("Could not verify header");
-                    JOptionPane.showMessageDialog(LogicSimModLoader.getApp().frame, "The file you are trying to load has mod specific data saved." +
+                    if (LSMLInternalMod.warnOnSave())
+                        JOptionPane.showMessageDialog(LogicSimModLoader.getApp().frame, "The file you are trying to load has mod specific data saved." +
                             "If you want to be safe, exit the save without saving anything.\nA Backup of the mod data will be created, but if you modify anything, this might be of no use."
                             , "Missing mods", JOptionPane.WARNING_MESSAGE);
                     Files.copy(ourFile.toPath(), new File(ourFile.getPath() + ".bak").toPath());

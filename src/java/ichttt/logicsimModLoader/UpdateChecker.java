@@ -26,6 +26,8 @@ import java.util.logging.Level;
 public class UpdateChecker implements Runnable {
     private static Map<ModContainer, VersionBase> modWithFoundUpdate = new HashMap<>();
     private static Map<ModContainer, URL> toCheck = new HashMap<>();
+    private static boolean isRunning = false;
+    private static boolean isFirstRun = true;
 
     public static void register(ModContainer yourMod, URL updateURL) {
         toCheck.put(yourMod, updateURL);
@@ -37,6 +39,7 @@ public class UpdateChecker implements Runnable {
      */
     @Override
     public void run() {
+        isRunning = true;
         for (Map.Entry<ModContainer, URL> entry : toCheck.entrySet()) {
             ModContainer yourMod = entry.getKey();
             URL updateURL = entry.getValue();
@@ -85,13 +88,24 @@ public class UpdateChecker implements Runnable {
     /**
      * Do not call from mod code!
      */
-    public static void printUpdateNotification() {
-        if (modWithFoundUpdate.isEmpty())
-            return;
-        StringBuilder builder = new StringBuilder();
-        builder.append("Some mods have updates available!");
-        modWithFoundUpdate.forEach((modContainer, versionBase) -> builder.append(String.format("\nMod %s: Installed version is %s, available version is %s",
-                modContainer.mod.modName(), modContainer.VERSION.getVersionString(), versionBase.getVersionString())));
-        LSMLUtil.showMessageDialogOnWindowIfAvailable(builder.toString());
+    private static void printUpdateNotification() {
+        if (modWithFoundUpdate.isEmpty()) {
+            if (isFirstRun)
+                isFirstRun = false;
+            else
+                LSMLUtil.showMessageDialogOnWindowIfAvailable("No updates found");
+        }
+        else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Some mods have updates available!");
+            modWithFoundUpdate.forEach((modContainer, versionBase) -> builder.append(String.format("\nMod %s: Installed version is %s, available version is %s",
+                    modContainer.mod.modName(), modContainer.VERSION.getVersionString(), versionBase.getVersionString())));
+            LSMLUtil.showMessageDialogOnWindowIfAvailable(builder.toString());
+        }
+        isRunning = false;
+    }
+
+    public static boolean isRunning() {
+        return isRunning;
     }
 }
