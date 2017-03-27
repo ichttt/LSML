@@ -54,12 +54,20 @@ public class UpdateChecker implements Runnable {
                 String read;
                 String modid = null;
                 String version = null;
+                boolean doContinue = false;
                 while ((read = bf.readLine()) != null) {
                     if (read.startsWith("#")) continue;
                     if (modid == null) modid = read;
                     else if (version == null) version = read;
-                    else throw new RuntimeException("Got too much data!");
+                    else {
+                        LSMLLog.error("Got too much data!");
+                        doContinue = true;
+                        break;
+                    }
                 }
+                if (doContinue)
+                    continue;
+
                 if (Strings.isNullOrEmpty(modid) || !modid.equalsIgnoreCase(yourMod.mod.modid())) {
                     LSMLLog.warning("Could not verify modid for updateURL" + updateURL);
                     return;
