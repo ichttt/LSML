@@ -56,7 +56,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     
     DefaultListModel jList_gates_model = new DefaultListModel();
     JList jList_gates = new JList(jList_gates_model);
-    public final LSPanel lspanel = new LSPanel(statusBar); //LSML: make public and final  TODO ALL F******* FIELDS
+    public final LSPanel lspanel = new LSPanel(statusBar); //LSML: make public and final. If you need other fields, use reflection
     JScrollPane jScrollPane_lspanel = new JScrollPane(lspanel);
     JSplitPane jSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
     
@@ -262,6 +262,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jMenuFile.add(jMenuItem_print);
         jMenuFile.add(jMenuFileExit);
         jMenuHelp.add(jMenuHelpAbout);
+        LSMLHooks.helpItem(jMenuHelp);
         jMenuHelp.add(jMenuItem_help);
         jMenuBar1.add(jMenuFile);
         jMenuBar1.add(jMenuModule);

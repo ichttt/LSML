@@ -26,11 +26,9 @@ import java.util.logging.Level;
 
 /**
  * Inter mod required for some LSML components.
- * <br><b>Do not depend on this version, it will not get bumped</b>.
- * <br>Depend on {@link ichttt.logicsimModLoader.init.LogicSimModLoader#LSML_VERSION} instead.
  * Do not depend on any of these methods, they may change without a warning
  */
-@Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING)
+@Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING, author = "Tobias Hotz")
 public class LSMLInternalMod implements ActionListener, IModGuiInterface {
     public static final String MODID = "LSML";
     private static Config config;

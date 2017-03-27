@@ -18,7 +18,6 @@ import java.util.List;
 public class ModListGui implements ListSelectionListener {
     private JSplitPane configPanel;
     private JDialog dialog;
-    private JPanel left;
     private static final List<String> modnames = new ArrayList<>();
     private static final List<IModGuiInterface> modGuiInterfaces = new ArrayList<>();
 
@@ -41,7 +40,7 @@ public class ModListGui implements ListSelectionListener {
         containerJList.setModel(listModel);
         containerJList.setSelectedIndex(0);
         containerJList.addListSelectionListener(this);
-        left = new JPanel();
+        JPanel left = new JPanel();
         configPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, modGuiInterfaces.get(0).draw());
         left.add(containerJList);
         dialog.add(configPanel);
@@ -49,7 +48,7 @@ public class ModListGui implements ListSelectionListener {
         dialog.setMinimumSize(new Dimension(600, 400));
         dialog.pack();
         //noinspection ConstantConditions
-        dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY()); //FIXME
+        dialog.setLocation(LogicSimModLoader.getApp().lsframe.getX(), LogicSimModLoader.getApp().lsframe.getY());
     }
 
     @Override

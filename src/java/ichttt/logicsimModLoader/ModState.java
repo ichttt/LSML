@@ -36,7 +36,7 @@ public enum ModState {
 
     /**
      * Gets the state of a mod
-     * @param predicate The predicate that decides this modContair is the modContainer you are searching for
+     * @param predicate The predicate that decides this modContainer is the modContainer you are searching for
      * @return The current state of the mod
      */
     @Nonnull

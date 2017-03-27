@@ -1,5 +1,6 @@
 package ichttt.logicsimModLoader.gui;
 
+import com.google.common.base.Strings;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
@@ -45,7 +46,10 @@ public class MenuBarHandler implements ActionListener {
         StringBuilder builder = new StringBuilder();
         builder.append("Loaded mods:");
         for (ModContainer container : Loader.getInstance().getMods()) {
-            builder.append("\n").append(String.format("%s v.%s (modid %s)", container.mod.modName(), container.VERSION.getVersionString(), container.mod.modid()));
+            if (Strings.isNullOrEmpty(container.mod.author()))
+                builder.append("\n").append(String.format("%s v.%s (modid %s)", container.mod.modName(), container.VERSION.getVersionString(), container.mod.modid()));
+            else
+                builder.append("\n").append(String.format("%s v.%s by %s (modid %s)", container.mod.modName(), container.VERSION.getVersionString(), container.mod.author(), container.mod.modid()));
         }
         LSMLUtil.showMessageDialogOnWindowIfAvailable(builder.toString());
     }

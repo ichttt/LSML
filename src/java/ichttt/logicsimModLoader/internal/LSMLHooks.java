@@ -5,6 +5,7 @@ import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.event.loading.LSMLInitEvent;
 import ichttt.logicsimModLoader.gui.MenuBarHandler;
 import ichttt.logicsimModLoader.init.ProgressBarManager;
+import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.swing.*;
 
@@ -28,5 +29,11 @@ public class LSMLHooks {
      */
     public static void menuBar(JMenuBar bar) {
         MenuBarHandler.addItems(bar);
+    }
+
+    public static void helpItem(JMenu help) {
+        JMenuItem aboutLsml = new JMenuItem("About LSML");
+        aboutLsml.addActionListener(event -> LSMLUtil.showMessageDialogOnWindowIfAvailable("LSML - The LogicSim Mod Loader\nCopyright Tobias Hotz, 2017.\nLicensed under GPL2+"));
+        help.add(aboutLsml);
     }
 }

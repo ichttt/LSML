@@ -36,6 +36,12 @@ public @interface Mod {
     String version();
 
     /**
+     * The author of the mod. Will be displayed when listing all mods
+     * @since 0.1.2
+     */
+    String author() default "";
+
+    /**
      * A short description what your mod is doing.
      * Currently unused //TODO
      * @since 0.0.1
