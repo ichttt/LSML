@@ -27,7 +27,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.1.2";
+    public static final String LSML_VERSION_STRING = "0.1.3";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -53,12 +53,12 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
 
     /**
      * Starts off LSML and LogicSim itself
-     * Dont't start from here if you are in a dev environment, start from {@link #startFromDev()}
+     * Don't start from here if you are in a dev environment, start from {@link #startFromDev()}
      */
     public static void main(@Nullable String[] args) {
         if (hasInit)
             return;
-        Thread.setDefaultUncaughtExceptionHandler(new LogicSimModLoader());
+        Thread.currentThread().setUncaughtExceptionHandler(new LogicSimModLoader()); //Add exception handler for this thread
         ProgressBarManager.init(); //init the progress bar
         Loader loader = Loader.getInstance(); //init loader to load libs
         coreInit();
@@ -130,7 +130,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         if (e instanceof MissingDependencyException) {
             LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not continue because some mods are missing dependencies\n" + e.getMessage());
         } else {
-            LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
+            LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue loading. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
         }
         System.exit(-1);
     }

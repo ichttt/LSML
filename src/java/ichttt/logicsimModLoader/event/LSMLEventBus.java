@@ -4,10 +4,15 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import ichttt.logicsimModLoader.exceptions.MissingDependencyException;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.util.LSMLUtil;
+import logicsim.App;
+import logicsim.LSFrame;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 /**
@@ -23,6 +28,18 @@ public class LSMLEventBus implements SubscriberExceptionHandler {
             LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not continue because some mods are missing dependencies\n" + exception.getMessage());
         } else {
             LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
+        }
+        App app = LogicSimModLoader.getApp();
+        if (app != null && app.frame.isVisible()) {
+            try {
+                Method save = LSFrame.class.getDeclaredMethod("jMenuItem_saveas_actionPerformed", ActionEvent.class);
+                save.setAccessible(true);
+                save.invoke(app.lsframe, (ActionEvent) null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LSMLLog.error("Could not save data!");
+                return;
+            }
         }
         System.exit(-1);
     }
