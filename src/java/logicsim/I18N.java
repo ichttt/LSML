@@ -23,6 +23,8 @@ import javax.swing.JApplet;
 public class I18N {
     
     public static Properties prop = null;
+    private static String lang;
+    public static String getLanguageKey() { return lang; }
     
     public I18N() {
         this(null);
@@ -32,7 +34,7 @@ public class I18N {
     public I18N(JApplet applet) {
         if (prop!=null) return;
         
-        String lang="en";
+        lang="en";
         try {
             Properties userProperties = new Properties();
             if (applet!=null) {

@@ -25,9 +25,9 @@ public class LSMLEventBus implements SubscriberExceptionHandler {
     public void handleException(Throwable exception, SubscriberExceptionContext context) { // treat eventbus exceptions as normal exceptions
         LSMLLog.log("----------REPORTING EXCEPTION THROWN----------", Level.SEVERE, exception);
         if (exception instanceof MissingDependencyException) {
-            LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not continue because some mods are missing dependencies\n" + exception.getMessage());
+            LSMLUtil.showMessageDialogOnWindowIfAvailable(LogicSimModLoader.translate("missingDeps") + "\n" + exception.getMessage());
         } else {
-            LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
+            LSMLUtil.showMessageDialogOnWindowIfAvailable(LogicSimModLoader.translate("unexpectedError"), LogicSimModLoader.translate("exception"), JOptionPane.ERROR_MESSAGE);
         }
         App app = LogicSimModLoader.getApp();
         if (app != null && app.frame.isVisible()) {

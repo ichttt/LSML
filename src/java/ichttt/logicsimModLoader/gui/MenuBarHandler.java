@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.gui;
 
 import com.google.common.base.Strings;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
@@ -16,8 +17,8 @@ import java.awt.event.ActionListener;
  */
 public class MenuBarHandler implements ActionListener {
     public static final JMenu mods = new JMenu("Mods");
-    private static JMenuItem settings = new JMenuItem("Open mods settings");
-    private static JMenuItem modList = new JMenuItem("Show loaded mods");
+    private static final JMenuItem settings = new JMenuItem(LogicSimModLoader.translate("showModSettings"));
+    private static final JMenuItem modList = new JMenuItem(LogicSimModLoader.translate("showMods"));
 
     /**
      * Internal method, do not call
@@ -39,12 +40,12 @@ public class MenuBarHandler implements ActionListener {
             listMods();
         }
         else
-            LSMLLog.error("Unkown source %s" + e.getSource());
+            LSMLLog.error("Unknown source %s" + e.getSource());
     }
 
     private static void listMods() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Loaded mods:");
+        builder.append(LogicSimModLoader.translate("loadedMods"));
         for (ModContainer container : Loader.getInstance().getMods()) {
             if (Strings.isNullOrEmpty(container.mod.author()))
                 builder.append("\n").append(String.format("%s v.%s (modid %s)", container.mod.modName(), container.VERSION.getVersionString(), container.mod.modid()));

@@ -14,8 +14,10 @@ import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.util.I18nHelper;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 import logicsim.App;
+import logicsim.I18N;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -27,10 +29,18 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.1.3";
+    public static final String LSML_VERSION_STRING = "0.1.4";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
+    private static I18nHelper i18n;
+
+    /**
+     * LSML INTERNAL - Use an instance of {@link I18nHelper} for your own code
+     */
+    public static String translate(String s) {
+        return i18n == null ? s : i18n.translate(s);
+    }
 
     /**
      * Run this from your dev environment to test your mod
@@ -62,6 +72,8 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         ProgressBarManager.init(); //init the progress bar
         Loader loader = Loader.getInstance(); //init loader to load libs
         coreInit();
+        i18n = new I18nHelper("lsml");
+
         //Init our mod first
         try {
             loader.addMod(LSMLInternalMod.class);
@@ -69,6 +81,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         catch (Exception e) {
             LSMLLog.warning("Could not load internal LSMLMod!");
         }
+
         ProgressBarManager.stepBar("Searching mods...");
         loader.searchMods();
         ProgressBarManager.stepBar("Registering mod hooks...");
@@ -92,6 +105,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         ProgressBarManager.stepBar("Sending PostInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.POSTINIT);
+
         //Close registration window for CustomSaves
         SaveHandler.closeRegistrationWindow();
         ProgressBarManager.destroyWindow();
@@ -106,6 +120,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
             return;
         hasInit = true;
         LSMLLog.init();
+        new I18N(); //Create this as early as possible
         ConfigInit.init();
         registerSubscriptions();
     }
@@ -128,9 +143,9 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
     public void uncaughtException(Thread t, Throwable e) {
         LSMLLog.log("----------REPORTING EXCEPTION THROWN----------", Level.SEVERE, e);
         if (e instanceof MissingDependencyException) {
-            LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not continue because some mods are missing dependencies\n" + e.getMessage());
+            LSMLUtil.showMessageDialogOnWindowIfAvailable(translate("missingDeps") + "\n" + e.getMessage());
         } else {
-            LSMLUtil.showMessageDialogOnWindowIfAvailable("There was an unexpected error and LSML could not continue loading. Further information can be found in the log", "Exception in app", JOptionPane.ERROR_MESSAGE);
+            LSMLUtil.showMessageDialogOnWindowIfAvailable(translate("unexpectedError"), translate("exception"), JOptionPane.ERROR_MESSAGE);
         }
         System.exit(-1);
     }

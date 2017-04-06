@@ -68,19 +68,19 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface {
     @Override
     public void setup() {
         panel = new JPanel(new GridLayout(0,1));
-        panel.add(new JLabel("LogicSimModLoader Settings"));
+        panel.add(new JLabel(LogicSimModLoader.translate("LSMLSettings")));
 
-        warnOnSaveBox = new JCheckBox("Warn on load if mod-saved data could not be loaded");
+        warnOnSaveBox = new JCheckBox(LogicSimModLoader.translate("warnOnLoad"));
         warnOnSaveBox.setSelected(warnOnSave.getValue());
         warnOnSaveBox.addActionListener(this);
         panel.add(warnOnSaveBox);
 
-        checkForUpdatesBox = new JCheckBox("Enable a lightweight update checker");
+        checkForUpdatesBox = new JCheckBox(LogicSimModLoader.translate("updateChecker"));
         checkForUpdatesBox.setSelected(checkForUpdates.value);
         checkForUpdatesBox.addActionListener(this);
         panel.add(checkForUpdatesBox);
 
-        JButton searchUpdatesNow = new JButton("Search now!");
+        JButton searchUpdatesNow = new JButton(LogicSimModLoader.translate("searchNow") + "!");
         searchUpdatesNow.setActionCommand("searchNow");
         searchUpdatesNow.addActionListener(this);
         panel.add(searchUpdatesNow);

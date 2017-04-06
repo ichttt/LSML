@@ -13,7 +13,25 @@ import java.util.logging.*;
 public class LSMLLog {
     private static final Logger logger = Logger.getLogger("LogicSimModLoader");
     private static boolean hasInit = false;
+    private static FileHandler handler;
 
+    /**
+     * Get your own logger you can use for your mod.
+     * Your logs will be saved to the save log file as LSML's log files
+     * @param modid Your modid
+     * @return The logger you should use for logging
+     * @since 0.1.4
+     */
+    public static Logger getCustomLogger(String modid) {
+        Logger logger = Logger.getLogger(modid);
+        logger.addHandler(handler);
+        logger.fine("Set up logger for " + modid);
+        return logger;
+    }
+
+    //***********************
+    //*****LSML INTERNAL*****
+    //***********************
     public static void init() {
         if (hasInit) {
             LSMLLog.warning("Tried init the logger twice!");
@@ -21,7 +39,6 @@ public class LSMLLog {
         }
         logger.setLevel(Level.ALL);
         hasInit = true;
-        Handler handler;
         String logPath = Loader.getInstance().basePath.toString() + "/log";
         if ((new File(logPath)).mkdirs()) {
             LSMLLog.error("Could not create log save dirs!");
