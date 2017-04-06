@@ -189,9 +189,10 @@ public class Config extends ConfigElement {
             LSMLLog.fine("Should close registration window but already closed!");
             return;
         }
-        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        if (mod != null && !LogicSimModLoader.isInDev())
-            throw new ModException(mod, "A mod tried closing the registration window. THIS IS NOT ALLOWED!");
+        if (LSMLUtil.isCalledFromModCode()) {
+            LSMLLog.error("A mod tried closing the registration window. THIS IS NOT ALLOWED!");
+            return;
+        }
         registrationAllowed = false;
     }
 
@@ -208,7 +209,7 @@ public class Config extends ConfigElement {
             if (mod != null)
                 LSMLLog.warning("A config parser from mod %s (modid %s) is registered late!", mod.modName(), mod.modid());
             else
-                LSMLLog.warning("A config parser from is registered late!");
+                LSMLLog.warning("A config parser is registered late!");
         }
         final boolean[] duplicateParser = new boolean[1];
         entryParsers.forEach(parser1 -> {

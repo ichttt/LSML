@@ -36,7 +36,7 @@ public class ProgressBarManager {
      * DO NOT CALL FROM MOD CODE!
      */
     public static void stepBar(String text) {
-        if (LSMLUtil.getActiveModFromCurrentThread() != null && !LogicSimModLoader.isInDev()) {
+        if (LSMLUtil.isCalledFromModCode()) {
             LSMLLog.warning("A mod tried stepping the progress bar!");
             return;
         }

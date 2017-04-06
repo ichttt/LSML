@@ -100,10 +100,10 @@ public class Loader {
      * @since 0.0.1
      */
     public void searchMods() {
-        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        if (mod != null && !LogicSimModLoader.isInDev())
-            throw new ModException(mod, "Mod called search mods. THIS IS NOT ALLOWED!");
-        else
+        if (LSMLUtil.isCalledFromModCode()) {
+            LSMLLog.error("Mod called search mods. THIS IS NOT ALLOWED!");
+            return;
+        } else
             LSMLLog.fine("Loading mods...");
         File[] files = modPath.listFiles();
         if (files == null) {

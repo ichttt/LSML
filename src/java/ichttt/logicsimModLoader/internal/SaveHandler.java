@@ -166,9 +166,8 @@ public class SaveHandler {
             LSMLLog.fine("Should close registration window but already closed!");
             return;
         }
-        Mod faultyMod = LSMLUtil.getActiveModFromCurrentThread();
-        if (faultyMod != null && !LogicSimModLoader.isInDev())
-            throw new ModException(faultyMod, "A mod tried closing the registration window. THIS IS NOT ALLOWED!");
+        if (LSMLUtil.isCalledFromModCode())
+            LSMLLog.error("A mod tried closing the registration window. THIS IS NOT ALLOWED!");
         registrationAllowed = false;
         if (!saveHandlers.isEmpty()) {
             StringBuilder writerList = new StringBuilder();

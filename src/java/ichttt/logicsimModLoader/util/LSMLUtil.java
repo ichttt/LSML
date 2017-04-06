@@ -57,6 +57,17 @@ public class LSMLUtil {
     }
 
     /**
+     * Determines if a method is called from mod code.
+     * <br><b>This code is unsafe and may fail!</b>
+     * Only use this for logging purposes
+     * @return true if called from a mod
+     * @since 0.1.4
+     */
+    public static boolean isCalledFromModCode() {
+        return getActiveModFromCurrentThread() != null && !LogicSimModLoader.isInDev();
+    }
+
+    /**
      * Returns the mod annotation for a given class name
      * @param className The name of the class annotated with {@link Mod}
      * @return The mod annotation or null if not present
