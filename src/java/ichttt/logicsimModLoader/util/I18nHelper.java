@@ -3,17 +3,19 @@ package ichttt.logicsimModLoader.util;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import logicsim.I18N;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * Helper for LogicSim's {@link I18N} class to support custom files.
  * @since 0.1.4
  */
 public class I18nHelper {
-    private ResourceBundle DEFAULT;
-    private final ResourceBundle FALLBACK;
+    @Nullable
+    private ResourceBundle DEFAULT, FALLBACK;
 
     /**
      * Creates a I18n helper for your mod.
@@ -22,7 +24,12 @@ public class I18nHelper {
      * @param baseName The name of your resource files without "_[Language Key]"
      */
     public I18nHelper(String baseName) {
-        FALLBACK = ResourceBundle.getBundle(baseName, Locale.ENGLISH);
+        try {
+            FALLBACK = ResourceBundle.getBundle(baseName, Locale.ENGLISH);
+        } catch (MissingResourceException e) {
+            LSMLLog.log(String.format("Error loading default resources for %s, strings may not be translated if selected.", baseName), Level.SEVERE, e);
+            FALLBACK = null;
+        }
         try {
             DEFAULT = ResourceBundle.getBundle(baseName + "_" + I18N.getLanguageKey());
         }  catch (MissingResourceException e) {
@@ -41,11 +48,11 @@ public class I18nHelper {
     public String translate(String key) {
         try {
             return DEFAULT.getString(key);
-        } catch (MissingResourceException e) {
+        } catch (MissingResourceException | NullPointerException e) {
             e.printStackTrace();
             try {
                 return FALLBACK.getString(key);
-            } catch (MissingResourceException e1) {
+            } catch (MissingResourceException | NullPointerException e1) {
                 return key;
             }
         }
