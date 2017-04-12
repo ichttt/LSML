@@ -29,7 +29,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.1.4";
+    public static final String LSML_VERSION_STRING = "0.1.5";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -69,9 +69,19 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         if (hasInit)
             return;
         Thread.currentThread().setUncaughtExceptionHandler(new LogicSimModLoader()); //Add exception handler for this thread
-        ProgressBarManager.init(); //init the progress bar
-        Loader loader = Loader.getInstance(); //init loader to load libs
+        boolean loadProgressBar = true;
+        if (args != null) {
+            if (args.length != 0 && args[0].equalsIgnoreCase("disableProgressBar")) {
+                loadProgressBar = false;
+            }
+        }
+        if (loadProgressBar)
+            ProgressBarManager.init(); //init the progress bar
+        else
+            LSMLLog.info("ProgressBar is disabled");
         coreInit();
+        Loader loader = Loader.getInstance(); //init loader to load libs
+        registerSubscriptions();
         i18n = new I18nHelper("lsml");
 
         //Init our mod first
@@ -106,10 +116,12 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());
         ModContainer.doTransitionOnAllMods(ModState.POSTINIT);
 
+        LSMLLog.fine("Finishing up...");
         //Close registration window for CustomSaves
         SaveHandler.closeRegistrationWindow();
         ProgressBarManager.destroyWindow();
         app.frame.setVisible(true);
+        LSMLLog.fine("Done. LSML and LogicSim started successfully");
     }
 
     /**
@@ -122,7 +134,6 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         LSMLLog.init();
         new I18N(); //Create this as early as possible
         ConfigInit.init();
-        registerSubscriptions();
     }
 
     private static void registerSubscriptions() {

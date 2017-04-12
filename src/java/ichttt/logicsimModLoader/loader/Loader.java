@@ -44,13 +44,9 @@ public class Loader {
     }
 
     @Nonnull
-    public final File modPath;
-    @Nonnull
     public final Path basePath;
     @Nonnull
-    public final File configPath;
-    @Nonnull
-    public final File libPath;
+    public final File configPath, libPath, modPath;
     private List<ModContainer> mods = new ArrayList<ModContainer>();
 
     /**
@@ -87,6 +83,7 @@ public class Loader {
 
         //Load libs. We do this here because something else may need it
         File[] libs = libPath.listFiles();
+        LSMLLog.fine("Loading libs");
         if (libs == null) {
             LSMLLog.error("Could not load libs - libPath.listFiles returned null!");
             throw new RuntimeException("Could not load libs - libPath.listFiles returned null!");
@@ -121,8 +118,8 @@ public class Loader {
             }
         }
 
-        LSMLLog.info("Successfully injected %s mods.", modFiles.size());
         for (File modFile : modFiles) {
+            LSMLLog.fine("Processing file %s", modFile);
             try {
                 String pathToInstance;
                 try {
@@ -133,7 +130,8 @@ public class Loader {
                 }
 
                 if (!addURL(modFile)) { //Add to classpath
-                    LSMLLog.warning("Skipping mod %s as it failed to inject into classpath!", modFile);
+                    LSMLLog.error("Skipping mod %s as it failed to inject into classpath!", modFile);
+                    continue;
                 }
 
                 Class<?> modClass = Class.forName(pathToInstance);
@@ -142,6 +140,7 @@ public class Loader {
                     LSMLLog.warning("Could not find Mod annotation for %s, skipping!", modFile);
                     continue;
                 }
+                LSMLLog.fine("Found Mod annotation");
 
                 // Check the modid
                 doModChecks(currentMod);
@@ -157,6 +156,7 @@ public class Loader {
                 throw new RuntimeException("Error loading mod file " + modFile, e);
             }
         }
+        LSMLLog.info("Successfully injected %s mods.", modFiles.size());
     }
 
     private void register(Class<?> clazz) throws IllegalAccessException, InstantiationException {

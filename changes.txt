@@ -1,5 +1,23 @@
 LSML changelog
 
+0.1.5
+ADDED:
+New SimpleStorage to provide a simple reference implementation of the ISaveHandler
+more debug log output
+
+CHANGED:
+code cleanup
+
+FIXED:
+Fixed a crash when no english local is provided.
+
+0.1.4
+ADDED:
+Initial support for I18n and custom loggers.
+
+CHANGED:
+Some code cleanup
+
 0.1.3
 FIXED:
 Fixed LSML stopping due to an exception thrown. It only stops now if there is an exception while loading or in the EventBus.
@@ -12,7 +30,6 @@ About LSML item in help
 
 CHANGED:
 LSML does no longer hard crash if your receive too much data
-
 
 0.1.1
 ADDED:

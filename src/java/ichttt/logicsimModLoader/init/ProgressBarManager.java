@@ -30,6 +30,7 @@ public class ProgressBarManager {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
         frame.setVisible(true);
+        LSMLLog.fine("ProgressBar is activated");
     }
 
     /**
@@ -40,11 +41,15 @@ public class ProgressBarManager {
             LSMLLog.warning("A mod tried stepping the progress bar!");
             return;
         }
+        LSMLLog.fine("BAR STEP - " + text);
+        if (label == null)
+            return;
         label.setText(text);
         bar.setValue(bar.getValue() + 1);
     }
 
     static void destroyWindow() {
-        frame.dispose();
+        if (frame != null)
+            frame.dispose();
     }
 }

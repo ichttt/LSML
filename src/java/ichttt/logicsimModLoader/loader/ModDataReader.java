@@ -31,7 +31,7 @@ class ModDataReader {
                 if (read.startsWith(SHA_STRING) || read.startsWith(SHA_STRING.toLowerCase()) || read.startsWith(SHA_STRING.toUpperCase()))
                     parseJarValidation(jarFile, read);
                 if (read.startsWith(MOD_CLASS_STRING) || read.startsWith(MOD_CLASS_STRING.toLowerCase()) || read.startsWith(MOD_CLASS_STRING.toUpperCase()))
-                    modClass = parseModClass(read);
+                    modClass = parseModClass(jarFile, read);
             }
         }
         finally {
@@ -43,8 +43,10 @@ class ModDataReader {
     }
 
     @Nonnull
-    private static String parseModClass(String line) {
-        return line.substring(MOD_CLASS_STRING.length());
+    private static String parseModClass(File jarFile, String line) {
+        String s = line.substring(MOD_CLASS_STRING.length());
+        LSMLLog.fine(".moddata claims %s to be @mod class for mod %s", s, jarFile.toString());
+        return s;
     }
 
 
