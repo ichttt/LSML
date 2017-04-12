@@ -1,12 +1,11 @@
 package ichttt.logicsimModLoader.config;
 
 
+import com.google.common.base.Strings;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.entry.ConfigEntryBase;
 import ichttt.logicsimModLoader.config.entry.IConfigEntryParser;
 import ichttt.logicsimModLoader.exceptions.MalformedConfigException;
-import ichttt.logicsimModLoader.exceptions.ModException;
-import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
@@ -43,13 +42,9 @@ public class Config extends ConfigElement {
     @Override
     @Nonnull
     public List<String> generateLines() {
-        String CONFIG_FOR_MOD = "Config for mod ";
+        final String CONFIG_FOR_MOD = "Config for mod ";
         List<String> lines = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 30+CONFIG_FOR_MOD.length()+modName.length(); i++) {
-            builder.append("-");
-        }
-        String s = builder.toString();
+        String s = Strings.repeat("-", 30 + CONFIG_FOR_MOD.length() + modName.length());
         lines.add(s);
         lines.add("---------------" + CONFIG_FOR_MOD + modName + "---------------");
         lines.add(s);
@@ -138,7 +133,8 @@ public class Config extends ConfigElement {
                     commentLines.add(split2[1]);
                     continue;
                 }
-                if (line.replaceAll(" ", "").equals("|")) continue;
+                if (line.replaceAll(" ", "").equals("|"))
+                    continue;
 
                 throw new MalformedConfigException("Could not find an association for the following line:\n" + line);
             }
@@ -211,12 +207,9 @@ public class Config extends ConfigElement {
             else
                 LSMLLog.warning("A config parser is registered late!");
         }
-        final boolean[] duplicateParser = new boolean[1];
-        entryParsers.forEach(parser1 -> {
-            if (parser1.getClass().equals(parser.getClass()))
-                duplicateParser[0] = true;
-        });
-        if (!entryParsers.contains(parser) &&  !duplicateParser[0]) {
+        boolean duplicateParser = entryParsers.stream().
+                anyMatch(entryParser -> parser.getClass().equals(entryParser.getClass()));
+        if (!entryParsers.contains(parser) &&  !duplicateParser) {
             entryParsers.add(parser);
         }
         else

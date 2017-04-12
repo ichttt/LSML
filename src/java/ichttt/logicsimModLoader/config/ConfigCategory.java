@@ -1,6 +1,8 @@
 package ichttt.logicsimModLoader.config;
 
+import com.google.common.base.Strings;
 import ichttt.logicsimModLoader.config.entry.ConfigEntryBase;
+import ichttt.logicsimModLoader.internal.LSMLLog;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,13 +20,16 @@ public class ConfigCategory extends ConfigElement {
     /**
      * Creates a new ConfigCategory
      * <b>Do not create categories with duplicate names!</b>
+     * Please don't use null as a name, support will be remove soon(tm)
      * @param name The name of the category
      * @since 0.0.1
      */
     public ConfigCategory(@Nullable String name) {
         super(1);
-        if (name == null)
+        if (name == null) {
+            LSMLLog.warning("ConfigCategory is using null as name. This is deprecated!");
             name = "Default";
+        }
         this.name = name;
     }
 
@@ -44,7 +49,7 @@ public class ConfigCategory extends ConfigElement {
                     return;
                 } catch (Exception e) {
                     //Just fall back to the old behavior
-                    toRemove= entryBase;
+                    toRemove = entryBase;
                     break; //Should only find one
                 }
             }
@@ -77,17 +82,15 @@ public class ConfigCategory extends ConfigElement {
             lines.addAll(entry.getOffsetLines());
             lines.add("");
         }
+
         if (lines.size()>1) {
             for (int i = 1; i < lines.size(); i++) {
                 lines.set(i, "|" + lines.get(i));
             }
         }
 
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < name.length()+20; i++) {
-            builder.append("-");
-        }
-        lines.add(builder.toString());
+        String s = Strings.repeat("-", name.length() + 20);
+        lines.add(s);
         return lines;
     }
 }

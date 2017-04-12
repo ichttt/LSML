@@ -3,7 +3,7 @@ package ichttt.logicsimModLoader.event;
 import logicsim.Gate;
 
 /**
- * Created by Tobias on 16.03.2017.
+ * Various gate related events
  */
 public abstract class GateEvent {
 

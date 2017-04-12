@@ -1,5 +1,7 @@
 package ichttt.logicsimModLoader.config;
 
+import com.google.common.base.Strings;
+
 import javax.annotation.Nonnull;
 import java.util.List;
 
@@ -23,11 +25,7 @@ public abstract class ConfigElement {
      */
     @Nonnull
     protected String offset() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < offset; i++) {
-            builder.append("  ");
-        }
-        return builder.toString();
+        return Strings.repeat("  ", offset);
     }
 
     /**

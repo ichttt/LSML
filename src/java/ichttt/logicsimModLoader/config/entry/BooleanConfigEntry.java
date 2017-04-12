@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class BooleanConfigEntry extends ConfigEntryBase<Boolean> {
     public boolean value;
+
     /**
      * @since 0.0.1
      */

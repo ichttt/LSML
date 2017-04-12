@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.exceptions.ModException;
-import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
