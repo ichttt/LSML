@@ -56,7 +56,7 @@ public class ConfigInit {
                 allowNegative = false;
                 return true;
             }
-            if (line.contains("* Allowed values: -2147483647 up to 2147483647")) {
+            if (line.contains("* Allowed values: -2147483648 up to 2147483647")) {
                 allowNegative = true;
                 return true;
             }
