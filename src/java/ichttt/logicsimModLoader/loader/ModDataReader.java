@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 class ModDataReader {
     private static final String SHA_STRING = "SHA1String=";
     private static final String MOD_CLASS_STRING = "modClass=";
+
     @Nonnull
     static String parseModInfo(File jarFile, String rawName) throws IOException {
         BufferedReader reader = null;

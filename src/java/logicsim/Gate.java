@@ -173,7 +173,7 @@ public abstract class Gate implements Serializable {
 
   public void draw(Graphics g) {
     if (gateimage==null) loadImage(); // wenn Image noch nicht geladen wurde, wird es hier geladen, z.b. wenn dieses Gatter deserialisiert wurde
-    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateDrawEvent(this)); //LSML: fire
+    LSMLEventBus.EVENT_BUS.post(new GateEvent.GateDrawEvent(this, g)); //LSML: fire
 
     g.setColor(Color.black);
     g.drawImage(gateimage, x+3, y, null);

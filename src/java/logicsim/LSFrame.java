@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class LSFrame extends JInternalFrame implements java.awt.event.ActionListener {
+    private boolean isSaving = false;
+    private boolean isLoading = false;
+
     Object[] gateNames = {I18N.getString("GATE_SWITCH"), I18N.getString("GATE_LED"), I18N.getString("GATE_AND"), I18N.getString("GATE_NAND"),
     I18N.getString("GATE_OR"), I18N.getString("GATE_NOR"), I18N.getString("GATE_NOT"), I18N.getString("GATE_XOR"),
     I18N.getString("GATE_EQUIVALENCE"),
@@ -516,6 +519,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             jToggleButton_simulate.setSelected(false);
         }
 
+        isLoading = true;
         try {
             ObjectInputStream s = new ObjectInputStream(new FileInputStream(new File(fileName)));
             lspanel.gates = (GateList)s.readObject();
@@ -537,10 +541,11 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         lspanel.gates.reconnect();
 
         LSMLEventBus.EVENT_BUS.post(new SaveEventBase.LoadEvent(new File(fileName))); //LSML: fire event
-        
+
         lspanel.repaint();
         lspanel.changed=false;
-        
+
+        isLoading = false;
         staticReset();
     }
     
@@ -552,7 +557,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         
         if (fileName==null || fileName.length()==0 || fileName.equals(".") || fileName.equals("./circuits/")) //LSML: fix String compare with ==
             if (showSaveDialog()==false) return;
-
+        isSaving = true;
         LSMLEventBus.EVENT_BUS.post(new SaveEventBase.SaveEvent(new File(fileName))); //LSML: Fire
 
         try {
@@ -565,6 +570,8 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         } catch (IOException x) {
             showMessage(I18N.getString("ERROR_SAVE"));
             return;
+        } finally {
+           isSaving = false;
         }
         
         if (window!=null) {
@@ -835,7 +842,24 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             }
         }
     }
-    
+
+// --------------------LSML METHODS--------------------
+
+    /**
+     * @return True if LogicSim is in saving state
+     * @since 0.2.0
+     */
+    public boolean isSaving() {
+        return isSaving;
+    }
+
+    /**
+     * @return True if LogicSim is in loading state
+     * @since 0.2.0
+     */
+    public boolean isLoading() {
+        return isLoading;
+    }
 }
 
 class LSFrame_jList_gates_mouseAdapter extends java.awt.event.MouseAdapter {

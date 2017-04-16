@@ -1,5 +1,8 @@
 package logicsim;
 
+import ichttt.logicsimModLoader.event.GateEvent;
+import ichttt.logicsimModLoader.event.LSMLEventBus;
+
 import javax.swing.*;
 import java.awt.image.*;
 import java.awt.*;
@@ -120,6 +123,7 @@ public class LSPanel extends JPanel implements Printable {
 
     if (g!=null) {
       //gates.addGate(g);
+      LSMLEventBus.EVENT_BUS.post(new GateEvent.GateGUICreationEvent(g));
       gates.deactivateAll();
       currentGate=g;
     }
@@ -330,7 +334,7 @@ public class LSPanel extends JPanel implements Printable {
             changed=true;
           }
         }
-        if (statusBar.getText()!=I18N.getString("STATUS_CONNECTED")) {
+        if (!statusBar.getText().equals(I18N.getString("STATUS_CONNECTED"))) { //LSML: Fix another String comparision
           drawingWire.addPoint(mousePos.x,mousePos.y);
           drawingWire.draw(this.getGraphics());
           changed=true;

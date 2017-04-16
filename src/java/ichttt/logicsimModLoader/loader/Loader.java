@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -27,13 +26,6 @@ import java.util.List;
  * @since 0.0.1
  */
 public class Loader {
-    private static class IgnoreCaseSorter implements Comparator<File> {
-        @Override
-        public int compare(File file1, File file2) {
-            return file1 != null && file2 != null ? file1.getName().compareToIgnoreCase(file2.getName()) : file1 == null ? -1 : 1;
-        }
-    }
-
     private static Loader loader;
     @Nonnull
     public static Loader getInstance() {
@@ -48,6 +40,25 @@ public class Loader {
     @Nonnull
     public final File configPath, libPath, modPath;
     private List<ModContainer> mods = new ArrayList<ModContainer>();
+
+    private Loader() {
+        basePath = Paths.get(".").toAbsolutePath().normalize();
+        configPath = new File(basePath + "/config");
+        modPath = new File(basePath + "/mods");
+        libPath = new File(basePath + "/libs");
+        createDirsIfNotExist(modPath, "Successfully create mods folder", "Could not create mod path!");
+        createDirsIfNotExist(configPath, "Successfully create config folder", "Could not create config path!");
+        createDirsIfNotExist(libPath, null, null);
+
+        //Load libs. We do this here because something else may need it
+        File[] libs = libPath.listFiles();
+        LSMLLog.fine("Loading libs");
+        if (libs == null) {
+            LSMLLog.error("Could not load libs - libPath.listFiles returned null!");
+            throw new RuntimeException("Could not load libs - libPath.listFiles returned null!");
+        }
+        Arrays.stream(libs).forEach(Loader::addURL); //Add the libs to classpath
+    }
 
     /**
      * Gets all mods
@@ -72,25 +83,6 @@ public class Loader {
                 orElse(null);
     }
 
-    private Loader() {
-        basePath = Paths.get(".").toAbsolutePath().normalize();
-        configPath = new File(basePath + "/config");
-        modPath = new File(basePath + "/mods");
-        libPath = new File(basePath + "/libs");
-        createDirsIfNotExist(modPath, "Successfully create mods folder", "Could not create mod path!");
-        createDirsIfNotExist(configPath, "Successfully create config folder", "Could not create config path!");
-        createDirsIfNotExist(libPath, null, null);
-
-        //Load libs. We do this here because something else may need it
-        File[] libs = libPath.listFiles();
-        LSMLLog.fine("Loading libs");
-        if (libs == null) {
-            LSMLLog.error("Could not load libs - libPath.listFiles returned null!");
-            throw new RuntimeException("Could not load libs - libPath.listFiles returned null!");
-        }
-        Arrays.stream(libs).forEach(Loader::addURL); //Add the libs to classpath
-    }
-
     /**
      * Internal use only
      * @since 0.0.1
@@ -106,7 +98,7 @@ public class Loader {
             LSMLLog.error("Could not load mods - modPath.listFiles returned null!");
             throw new RuntimeException("Could not load mods - modPath.listFiles returned null!");
         }
-        Arrays.sort(files, new IgnoreCaseSorter());
+        Arrays.sort(files, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
         List<File> modFiles = new ArrayList<>();
         for (File possibleMod : files) {
             if (!possibleMod.isFile() || !possibleMod.getName().endsWith(".jar")) {
