@@ -40,7 +40,6 @@ public class LSMLUtil {
      */
     public static Mod getActiveModFromCurrentThread() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        stackTraceElements = inverseObjectArray(stackTraceElements);
         for (StackTraceElement ste : stackTraceElements) {
             Annotation annotation;
             try {
