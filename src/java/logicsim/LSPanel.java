@@ -1,6 +1,7 @@
 package logicsim;
 
 import ichttt.logicsimModLoader.event.GateEvent;
+import ichttt.logicsimModLoader.event.GlobalDrawEvent;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 
 import javax.swing.*;
@@ -162,6 +163,7 @@ public class LSPanel extends JPanel implements Printable {
     }
 
     draw(g);
+    LSMLEventBus.EVENT_BUS.post(new GlobalDrawEvent(g));
 
     if (currentGate!=null) {
       currentGate.draw(g);
