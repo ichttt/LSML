@@ -2,11 +2,13 @@ package ichttt.logicsimModLoader;
 
 import ichttt.logicsimModLoader.exceptions.InvalidVersionStringException;
 
+import javax.annotation.Nonnull;
+
 /**
  * A basic version system. The version is immutable
  * @since 0.0.1
  */
-public class VersionBase {
+public class VersionBase implements Comparable<VersionBase> {
     public final int major, minor, patch;
 
     public VersionBase(int major, int minor, int patch) {
@@ -49,19 +51,7 @@ public class VersionBase {
      * @return true if the requirement is satisfied
      */
     public boolean isMinimum(VersionBase versionBase) {
-        if (this.major<versionBase.major)
-            return false;
-        if (this.major>versionBase.major)
-            return true;
-        if (this.minor<versionBase.minor)
-            return false;
-        if (this.minor>versionBase.minor)
-            return true;
-        if (this.patch<versionBase.patch)
-            return false;
-        if (this.patch>=versionBase.patch)
-            return true;
-        throw new RuntimeException("You missed a case O.o");
+        return compareTo(versionBase) >= 0;
     }
 
     /**
@@ -70,5 +60,31 @@ public class VersionBase {
     @Override
     public String toString() {
         return getVersionString();
+    }
+
+    /**
+     * @since 0.2.0
+     */
+    @Override
+    public int compareTo(@Nonnull VersionBase o) {
+        int result = this.major - o.major;
+        if (result != 0)
+            return result;
+        result = this.minor - o.minor;
+        if (result != 0)
+            return result;
+        return this.patch - o.patch;
+    }
+
+    /**
+     * @since 0.2.0
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof VersionBase) {
+            VersionBase toCompare = (VersionBase) obj;
+            return toCompare.compareTo(this) == 0;
+        }
+        return false;
     }
 }

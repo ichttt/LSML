@@ -77,7 +77,7 @@ public class UpdateChecker implements Runnable {
                     return;
                 }
                 VersionBase modUpdateVersion = new VersionBase(version.trim());
-                if (!modUpdateVersion.getVersionString().equals(yourMod.VERSION.getVersionString()) && modUpdateVersion.isMinimum(yourMod.VERSION)) {
+                if (modUpdateVersion.compareTo(yourMod.VERSION) > 0) {
                     LSMLLog.info("Found update for mod %s: Installed version is %s, while current version is %s", yourMod.mod.modName(), yourMod.VERSION.getVersionString(), modUpdateVersion.getVersionString());
                     modWithFoundUpdate.put(yourMod, modUpdateVersion);
                 } else
