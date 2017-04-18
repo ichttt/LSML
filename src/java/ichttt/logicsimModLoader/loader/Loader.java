@@ -83,6 +83,11 @@ public class Loader {
                 orElse(null);
     }
 
+    public boolean hasMod(String modid) {
+        return mods.stream().
+                anyMatch(modContainer -> modContainer.mod.modid().equals(modid));
+    }
+
     /**
      * Internal use only
      * @since 0.0.1
