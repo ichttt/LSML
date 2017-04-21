@@ -37,8 +37,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     private final JEditorPane editorPane = new JEditorPane();
     private final JScrollPane rightScrollPanel;
     private final JDialog dialog;
-    private final JButton updateMod;
-    private final JButton visitURL;
+    private final JButton updateMod, updateAll, visitURL;
 
     private UpdateContext activeUpdateContext;
 
@@ -75,9 +74,10 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         lLayout.gridy = 1;
         lLayout.anchor = GridBagConstraints.PAGE_START;
         lLayout.fill = GridBagConstraints.BOTH;
-        JButton updateAll = new JButton("Update all possible mods");
+        updateAll = new JButton("Update all possible mods");
         updateAll.setToolTipText("Updates all mods that opted in to automatic update.\nNot all mod may be updated this way.");
         updateAll.addActionListener(event -> updateAll());
+        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(context -> context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded()));
         leftPanel.add(updateAll, lLayout);
 
         rLayout.weighty = 0.03;
@@ -203,6 +203,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
             if (UpdateUtil.updateMod(activeUpdateContext)) {
                 JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
                 updateMod.setEnabled(false);
+                updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(context -> context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded()));
             } else {
                 JOptionPane.showMessageDialog(dialog, "Could not update mod. You have to try manuel");
             }
