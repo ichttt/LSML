@@ -1,7 +1,7 @@
 package ichttt.logicsimModLoader.internal;
 
 import com.google.common.eventbus.Subscribe;
-import ichttt.logicsimModLoader.UpdateChecker;
+import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.ConfigCategory;
@@ -11,6 +11,7 @@ import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
@@ -40,9 +41,11 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface {
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
         try {
-            event.checkForUpdate(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt"));
+            event.checkForUpdate(new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
+                    withChangelogURL(new URL("https://raw.githubusercontent.com/ichttt/LSML/master/changes.txt")).
+                    withDownloadURL(new URL("https://github.com/ichttt/LSML/releases/latest")));
         } catch (MalformedURLException e) {
-            LSMLLog.log("What just happened?", Level.SEVERE, e);
+            LSMLLog.log("Error registering UpdateChecker. How?", Level.SEVERE, e);
         }
     }
 

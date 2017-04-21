@@ -1,7 +1,7 @@
 package ichttt.logicsimModLoader.init;
 
 import ichttt.logicsimModLoader.ModState;
-import ichttt.logicsimModLoader.UpdateChecker;
+import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
@@ -29,7 +29,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.2.0";
+    public static final String LSML_VERSION_STRING = "0.1.2";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -91,6 +91,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         catch (Exception e) {
             LSMLLog.warning("Could not load internal LSMLMod!");
         }
+        loader.updatePendingMods();
 
         ProgressBarManager.stepBar("Searching mods...");
         loader.searchMods();

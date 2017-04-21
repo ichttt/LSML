@@ -12,14 +12,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Loads the jarfiles from the libs and mods folder and parses them
@@ -38,17 +41,19 @@ public class Loader {
     @Nonnull
     public final Path basePath;
     @Nonnull
-    public final File configPath, libPath, modPath;
-    private List<ModContainer> mods = new ArrayList<ModContainer>();
+    public final File configPath, libPath, modPath, tempPath;
+    private final List<ModContainer> mods = new ArrayList<ModContainer>();
 
     private Loader() {
         basePath = Paths.get(".").toAbsolutePath().normalize();
         configPath = new File(basePath + "/config");
         modPath = new File(basePath + "/mods");
         libPath = new File(basePath + "/libs");
+        tempPath = new File(basePath + "/temp");
         createDirsIfNotExist(modPath, "Successfully create mods folder", "Could not create mod path!");
         createDirsIfNotExist(configPath, "Successfully create config folder", "Could not create config path!");
         createDirsIfNotExist(libPath, null, null);
+        createDirsIfNotExist(tempPath, null, null);
 
         //Load libs. We do this here because something else may need it
         File[] libs = libPath.listFiles();
@@ -141,7 +146,7 @@ public class Loader {
 
                 // Check the modid
                 doModChecks(currentMod);
-                ModContainer container = new ModContainer(currentMod);
+                ModContainer container = new ModContainer(currentMod, modFile, new File(modFile.toString().substring(0, modFile.toString().length() - 4) + ".modinfo"));
                 //Register mod to the EventBus
                 try {
                     register(modClass);
@@ -220,6 +225,51 @@ public class Loader {
             throw new RuntimeException("Modid cannot be empty!");
         if (getModContainerForModID(mod.modid()) != null) {
             throw new RuntimeException("Found duplicate modid " + mod.modid());
+        }
+    }
+
+    public void updatePendingMods() {
+        List<File> jarsToCopy = new ArrayList<>();
+        for (File f : tempPath.listFiles()) {
+            if (!f.isFile())
+                continue;
+            String filename = f.getName();
+            File inModDir = new File(modPath + "/" +filename);
+            if(filename.endsWith(".modinfo") && inModDir.exists()) {
+                if (!inModDir.delete()) {
+                    LSMLLog.log("Could not update mod " + f, Level.WARNING);
+                    continue;
+                }
+                try {
+                    Files.copy(f.toPath(), inModDir.toPath());
+                } catch (IOException e) {
+                    LSMLLog.log("Could not update mod " + f, Level.WARNING, e);
+                    continue;
+                }
+                jarsToCopy.add(new File(tempPath + "/" + filename.substring(0,filename.length() - ".modinfo".length()) + ".jar"));
+                if (!f.delete())
+                    LSMLLog.fine("Failed to cleanup file " + f);
+                else
+                    LSMLLog.fine("Updated modinfo " + f);
+            }
+        }
+        for (File f : jarsToCopy) {
+            String filename = f.getName();
+            File inModDir = new File(modPath + "/"+ filename);
+            if (!inModDir.delete()) {
+                LSMLLog.warning("Could not update mod " + f);
+                continue;
+            }
+            try {
+                Files.copy(f.toPath(), inModDir.toPath());
+            } catch (IOException e) {
+                LSMLLog.log("Could not update mod " + f, Level.WARNING, e);
+                continue;
+            }
+            if (!f.delete())
+                LSMLLog.info("Failed to cleanup file " + f);
+            else
+                LSMLLog.info("Updated jar " + f);
         }
     }
 }

@@ -7,6 +7,7 @@ import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.loader.Loader;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 
 /**
@@ -19,10 +20,18 @@ public class ModContainer {
     private ModState state = ModState.FOUND;
     @Nonnull
     public final VersionBase VERSION;
+    @Nullable
+    public final File jarFile, modinfoFile;
 
     public ModContainer(Mod mod) {
+        this(mod, null, null);
+    }
+
+    public ModContainer(Mod mod, @Nullable File jarFile, @Nullable File modinfoFile) {
         this.mod = mod;
         this.VERSION = new VersionBase(mod.version());
+        this.jarFile = jarFile;
+        this.modinfoFile = modinfoFile;
     }
 
     /**
@@ -59,7 +68,9 @@ public class ModContainer {
      * Get the state of a mod
      * @return The current state
      * @since 0.0.1
+     * @deprecated Use {@link Loader#hasMod(String)}
      */
+    @Deprecated
     @Nonnull
     public ModState getState() {
         return state;

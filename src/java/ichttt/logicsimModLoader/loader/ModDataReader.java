@@ -12,16 +12,14 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @since 0.0.1
  */
-class ModDataReader {
+public class ModDataReader {
     private static final String SHA_STRING = "SHA1String=";
     private static final String MOD_CLASS_STRING = "modClass=";
 
-    @Nonnull
-    static String parseModInfo(File jarFile, String rawName) throws IOException {
+    public static String parseModInfo(File jarFile, File modInfo) throws IOException{
         BufferedReader reader = null;
         String modClass = null;
         try {
-            File modInfo = new File(rawName + ".modinfo");
             reader = new BufferedReader(new FileReader(modInfo));
             String read;
             while (true) {
@@ -39,8 +37,13 @@ class ModDataReader {
             LSMLUtil.closeSilent(reader);
         }
         if (modClass == null)
-            throw new MalformedFileException(String.format("Mod %s does not define modClass", rawName));
+            throw new MalformedFileException(String.format("Mod %s does not define modClass", jarFile));
         return modClass;
+    }
+
+    @Nonnull
+    public static String parseModInfo(File jarFile, String rawName) throws IOException {
+        return parseModInfo(jarFile, new File(rawName + ".modinfo"));
     }
 
     @Nonnull
@@ -82,15 +85,12 @@ class ModDataReader {
                 LSMLLog.fine("Found valid checksum for mod %s", jarFile);
             }
         } catch (NoSuchAlgorithmException e) { //What JRE does not have SHA1...
-            boolean ignoreMissAlgorithm = false;
-            try {
-                if (!System.getProperty("lsml.ignoreMissingAlgorithm").equalsIgnoreCase("true"))
-                    ignoreMissAlgorithm = true;
-            } catch (Exception ignored) {}
+            boolean ignoreMissAlgorithm = Boolean.parseBoolean(System.getProperty("lsml.ignoreMissingAlgorithm", "false"));
             if (!ignoreMissAlgorithm) {
                 LSMLLog.error("Stopping loading because the file %s cold not be verified and lsml.ignoreMissingAlgorithm is not set to true!", jarFile);
                 throw new SecurityException("Cannot continue loading because of security concerns.");
-            }
+            } else
+                LSMLLog.warning("*** IGNORING MISSING ALGORITHM SHA1. MODS WILL NOT BE VERIFIED!");
         } finally {
             LSMLUtil.closeSilent(inputStream);
         }

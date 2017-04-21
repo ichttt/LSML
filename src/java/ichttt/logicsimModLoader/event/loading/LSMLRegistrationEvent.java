@@ -1,7 +1,7 @@
 package ichttt.logicsimModLoader.event.loading;
 
 import com.google.common.base.Preconditions;
-import ichttt.logicsimModLoader.UpdateChecker;
+import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.api.ISaveHandler;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
@@ -11,6 +11,7 @@ import ichttt.logicsimModLoader.gui.IModGuiInterface;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import java.net.URL;
@@ -73,10 +74,16 @@ public class LSMLRegistrationEvent {
 
     /**
      * @since 0.0.4
+     * @deprecated Use {@link #checkForUpdate(UpdateContext)}
      */
+    @Deprecated
     public void checkForUpdate(ModContainer yourMod, URL updateURL) {
         Preconditions.checkNotNull(yourMod);
         Preconditions.checkNotNull(updateURL);
         UpdateChecker.register(yourMod, updateURL);
+    }
+
+    public void checkForUpdate(UpdateContext context) {
+        UpdateChecker.register(context);
     }
 }
