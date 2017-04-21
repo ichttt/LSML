@@ -28,7 +28,6 @@ import java.util.logging.Level;
  */
 public class UpdateChecker implements Runnable {
     private static Map<UpdateContext, VersionBase> modWithFoundUpdate = new HashMap<>();
-//    private static Map<ModContainer, URL> toCheck = new HashMap<>();
     private static List<UpdateContext> toCheck = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean isFirstRun = true;
@@ -36,7 +35,6 @@ public class UpdateChecker implements Runnable {
     @Deprecated
     public static void register(ModContainer yourMod, URL updateURL) {
         register(new UpdateContext(yourMod, updateURL));
-//        toCheck.put(yourMod, updateURL);
     }
 
     public static void register(UpdateContext context) {
@@ -91,6 +89,7 @@ public class UpdateChecker implements Runnable {
                 VersionBase modUpdateVersion = new VersionBase(version.trim());
                 if (modUpdateVersion.compareTo(yourMod.VERSION) > 0) {
                     LSMLLog.info("Found update for mod %s: Installed version is %s, while current version is %s", yourMod.mod.modName(), yourMod.VERSION.getVersionString(), modUpdateVersion.getVersionString());
+                    context.getUpdateListener().onUpdateAvailable();
                     modWithFoundUpdate.put(context, modUpdateVersion);
                 } else
                     LSMLLog.fine("No update found for mod %s: Installed version is %s, while current version is %s", yourMod.mod.modName(), yourMod.VERSION.getVersionString(), modUpdateVersion.getVersionString());

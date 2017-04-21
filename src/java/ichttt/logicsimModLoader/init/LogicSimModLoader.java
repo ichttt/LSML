@@ -1,7 +1,5 @@
 package ichttt.logicsimModLoader.init;
 
-import ichttt.logicsimModLoader.ModState;
-import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
@@ -11,9 +9,9 @@ import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.exceptions.MissingDependencyException;
 import ichttt.logicsimModLoader.internal.LSMLInternalMod;
 import ichttt.logicsimModLoader.internal.LSMLLog;
-import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.util.I18nHelper;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 import logicsim.App;
@@ -30,7 +28,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.2.1";
+    public static final String LSML_VERSION_STRING = "0.2.0";
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -109,7 +107,6 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         Config.closeRegistrationWindow();
         ProgressBarManager.stepBar("Sending PreInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPreInitEvent());
-        ModContainer.doTransitionOnAllMods(ModState.PREINIT);
 
         if (LSMLInternalMod.checkForUpdates()) { //Need to do this here so the config is loaded
             LSMLLog.info("Starting LSML update checker...");
@@ -123,7 +120,6 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
         app = new App(); // This starts LogicSim
         ProgressBarManager.stepBar("Sending PostInit to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLPostInitEvent());
-        ModContainer.doTransitionOnAllMods(ModState.POSTINIT);
 
         LSMLLog.fine("Finishing up...");
         //Close registration window for CustomSaves

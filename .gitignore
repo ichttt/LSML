@@ -1,8 +1,8 @@
 .idea
 *.cfg
-log
-mods
-out
-doc
-circuits
-modules
+/log/
+/out/
+/doc/
+/circuits/
+/modules/
+/mods/

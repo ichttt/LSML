@@ -1,6 +1,5 @@
 package ichttt.logicsimModLoader.internal;
 
-import ichttt.logicsimModLoader.ModState;
 import ichttt.logicsimModLoader.event.LSMLEventBus;
 import ichttt.logicsimModLoader.event.loading.LSMLInitEvent;
 import ichttt.logicsimModLoader.gui.MenuBarHandler;
@@ -22,7 +21,6 @@ public class LSMLHooks {
     public static void doInit() {
         ProgressBarManager.stepBar("Sending Init to mods...");
         LSMLEventBus.EVENT_BUS.post(new LSMLInitEvent());
-        ModContainer.doTransitionOnAllMods(ModState.INIT);
     }
 
     /**

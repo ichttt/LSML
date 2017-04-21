@@ -53,4 +53,15 @@ public class NetworkHelper {
             LSMLUtil.closeSilent(input);
         }
     }
+
+    public static URL getLatestURLFromGithubAPI(URL apiLink) throws IOException {
+        String content = readURLUncached(apiLink);
+        String[] split = content.split("\"browser_download_url\":");
+        if (split.length % 2 != 0)
+            throw new IOException("Invalid length of array");
+        String[] subSpit = split[1].trim().split("\"");
+        if (subSpit.length < 2)
+            throw new IOException("Invalid length of array");
+        return new URL(subSpit[1]);
+    }
 }

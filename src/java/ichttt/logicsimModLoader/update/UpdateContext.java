@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update;
 
 import com.google.common.base.Preconditions;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.internal.ModContainer;
 
 import javax.annotation.Nonnull;
@@ -14,8 +15,9 @@ import java.net.URL;
 public class UpdateContext implements Comparable<UpdateContext> {
     public final ModContainer linkedModContainer;
     public final URL updateURL;
-    private URL website, changelogURL, pathToRemoteChar, pathToRemoteModinfo;
-    private boolean isFinished, isDownloaded;
+    private URL website, changelogURL, pathToRemoteJar, pathToRemoteModinfo;
+    private boolean isFinished, isDownloaded, noDownload;
+    private IUpdateListener updateListener = new DummyUpdateListener();
 
     public UpdateContext(ModContainer container, URL updateURL) {
         this.linkedModContainer = container;
@@ -42,9 +44,29 @@ public class UpdateContext implements Comparable<UpdateContext> {
 
     @Nonnull
     public UpdateContext enableAutoUpdate(URL pathToRemoteJar, URL pathToRemoteModinfo) {
-        checkNull(this.pathToRemoteChar, "Path to remote JAR is already set!");
-        this.pathToRemoteChar = pathToRemoteJar;
+        checkNull(this.pathToRemoteJar, "Path to remote JAR is already set!");
+        this.pathToRemoteJar = pathToRemoteJar;
         this.pathToRemoteModinfo = pathToRemoteModinfo;
+        return this;
+    }
+
+    /**
+     * Most mods shouldn't use this. <b>Only use this if you know what you are doing.</b>
+     * <br>LSML needs this because it isn't a mod.
+     * @param takeCareAboutDownloadYourself True to ensure that you take care about the button press yourself
+     */
+    public UpdateContext enableAutoUpdate(boolean takeCareAboutDownloadYourself) {
+        checkNull(this.pathToRemoteJar, "Path to remote JAR is already set!");
+        this.noDownload = takeCareAboutDownloadYourself;
+        return this;
+    }
+
+    /**
+     * @since 0.2.2
+     */
+    @Nonnull
+    public UpdateContext registerUpdateListener(IUpdateListener listener) {
+        this.updateListener = listener;
         return this;
     }
 
@@ -60,7 +82,11 @@ public class UpdateContext implements Comparable<UpdateContext> {
 
     @Nullable
     public URL getPathToRemoteJar() {
-        return pathToRemoteChar;
+        return pathToRemoteJar;
+    }
+
+    public boolean downloadAvailable() {
+        return ((this.pathToRemoteJar != null && this.pathToRemoteModinfo != null) || this.noDownload)&& !this.isDownloaded;
     }
 
     /**
@@ -69,6 +95,15 @@ public class UpdateContext implements Comparable<UpdateContext> {
     public void setDownloaded() {
         Preconditions.checkNotNull(this.website);
         this.isDownloaded = true;
+    }
+
+    @Nullable
+    public IUpdateListener getUpdateListener() {
+        return updateListener;
+    }
+
+    public boolean noDownloading() {
+        return noDownload;
     }
 
     public boolean isDownloaded() {
@@ -84,4 +119,6 @@ public class UpdateContext implements Comparable<UpdateContext> {
     public int compareTo(UpdateContext o) {
         return this.linkedModContainer.mod.modName().compareToIgnoreCase(o.linkedModContainer.mod.modName());
     }
+
+    private static final class DummyUpdateListener implements IUpdateListener {}
 }

@@ -1,6 +1,8 @@
 package ichttt.logicsimModLoader.internal;
 
 import com.google.common.eventbus.Subscribe;
+import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
@@ -13,14 +15,22 @@ import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.LSMLUtil;
+import ichttt.logicsimModLoader.util.NetworkHelper;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,22 +40,58 @@ import java.util.logging.Level;
  * Do not depend on any of these methods, they may change without a warning
  */
 @Mod(modid = LSMLInternalMod.MODID, modName = "LogicSimModLoader", version = LogicSimModLoader.LSML_VERSION_STRING, author = "Tobias Hotz")
-public class LSMLInternalMod implements ActionListener, IModGuiInterface {
+public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdateListener {
     public static final String MODID = "LSML";
     private static Config config;
     private static JPanel panel;
     private static BooleanConfigEntry warnOnSave, checkForUpdates;
     private static JCheckBox warnOnSaveBox, checkForUpdatesBox;
+    private static UpdateContext context;
+
+    @Override
+    public void onUpdateDownloadPost(VersionBase newVersion) throws IOException {
+        //We have to retrieve our URL dynamically
+        URL downloadURl = NetworkHelper.getLatestURLFromGithubAPI(new URL("https://api.github.com/repos/ichttt/LSML/releases/latest"));
+        Loader loader = Loader.getInstance();
+        Loader.createDirsIfNotExist(loader.tempPath, null, "Could not create temp path!");
+        File file = new File(loader.tempPath + "/LSMLUPDATE.zip");
+        File supposedLSMLFile = new File(loader.tempPath + "/LSMLUPDATE/LSML.jar");
+        file.deleteOnExit();
+        try {
+            NetworkHelper.readFileFromURL(downloadURl, file);
+            LSMLUtil.unzipZipFile(file, new File(loader.tempPath + "/LSMLUPDATE"));
+            if (!supposedLSMLFile.exists()) throw new IOException("Could not find File!");
+            Files.copy(supposedLSMLFile.toPath(), new File(loader.basePath.toString() + "/LSMLv" + newVersion + ".jar").toPath());
+        } finally {
+            Path directory = Paths.get(loader.tempPath + "/LSMLUPDATE");
+            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() { //http://stackoverflow.com/questions/779519/delete-directories-recursively-in-java/27917071#27917071
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+    }
 
     @Subscribe
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
         try {
-            event.checkForUpdate(new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
+            context = new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
                     withChangelogURL(new URL("https://raw.githubusercontent.com/ichttt/LSML/master/changes.txt")).
-                    withWebsite(new URL("https://github.com/ichttt/LSML/releases/latest")));
-        } catch (MalformedURLException e) {
-            LSMLLog.log("Error registering UpdateChecker. How?", Level.SEVERE, e);
+                    withWebsite(new URL("https://github.com/ichttt/LSML/releases/latest")).
+                    enableAutoUpdate(true).
+                    registerUpdateListener(this);
+            event.checkForUpdate(context);
+        } catch (IOException e) {
+            LSMLLog.log("Error registering UpdateChecker.", Level.SEVERE, e);
         }
     }
 

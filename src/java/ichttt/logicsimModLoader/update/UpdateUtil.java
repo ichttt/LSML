@@ -1,5 +1,6 @@
 package ichttt.logicsimModLoader.update;
 
+import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
@@ -11,16 +12,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Created by Tobias on 18.04.2017.
+ * Various utils needed for the new {@link UpdateChecker}
  */
 public class UpdateUtil {
-    public static boolean updateMod(UpdateContext ctx) {
+    public static boolean updateMod(UpdateContext ctx, VersionBase newVersion) {
         ModContainer container = ctx.linkedModContainer;
+        if (ctx.noDownloading()) {
+            try {
+                ctx.getUpdateListener().onUpdateDownloadPost(newVersion);
+            } catch (Exception e) {
+                return false;
+            }
+            ctx.setDownloaded();
+            return true;
+        }
+
         if (ctx.getPathToRemoteModinfo() == null || ctx.getPathToRemoteJar() == null || container.modinfoFile == null || container.jarFile == null)
             return false;
         File tempPath = Loader.getInstance().tempPath;
@@ -52,6 +61,11 @@ public class UpdateUtil {
             return false;
         }
         ctx.setDownloaded();
+        try {
+            ctx.getUpdateListener().onUpdateDownloadPost(newVersion);
+        } catch (IOException e) {
+            LSMLLog.fine("onUpdateDownloadPost failed, but everything is downloaded - Continue as normal!");
+        }
         return true;
     }
 
@@ -59,7 +73,7 @@ public class UpdateUtil {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(website.toURI());
-            } catch (URISyntaxException | IOException e) {
+            } catch (URISyntaxException | IOException | UnsupportedOperationException e) {
                 LSMLLog.log("Could not open link!", Level.WARNING, e);
             }
         }

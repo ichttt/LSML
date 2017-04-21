@@ -8,7 +8,13 @@ import logicsim.App;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Some util functions
@@ -113,6 +119,40 @@ public class LSMLUtil {
             JOptionPane.showMessageDialog(app.frame, message, title, messageType);
         else
             JOptionPane.showMessageDialog(null, message, title, messageType);
+    }
+
+    public static void unzipZipFile(File zipFile, File outputFolder){
+
+        byte[] buffer = new byte[4096];
+        ZipInputStream zis = null;
+        try {
+            zis = new ZipInputStream(new FileInputStream(zipFile));
+            ZipEntry entry = zis.getNextEntry();
+            while (entry != null) {
+                String fileName = entry.getName();
+                File newFile = new File(outputFolder + "/" + fileName);
+                if (fileName.endsWith("/")) {
+                    entry = zis.getNextEntry();
+                    continue;
+                }
+                FileOutputStream output = null;
+                (new File(newFile.getAbsolutePath()).getParentFile()).mkdirs();
+                try {
+                    output = new FileOutputStream(newFile);
+                    int read;
+                    while ((read = zis.read(buffer)) > 0) {
+                        output.write(buffer, 0, read);
+                    }
+                } finally {
+                    LSMLUtil.closeSilent(output);
+                }
+                entry = zis.getNextEntry();
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            LSMLUtil.closeSilent(zis);
+        }
     }
 
     /**

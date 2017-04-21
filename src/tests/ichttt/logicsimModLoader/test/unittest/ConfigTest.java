@@ -8,6 +8,7 @@ import ichttt.logicsimModLoader.config.entry.IntConfigEntry;
 import ichttt.logicsimModLoader.config.entry.StringConfigEntry;
 import ichttt.logicsimModLoader.exceptions.MalformedConfigException;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,6 +53,11 @@ public class ConfigTest {
         config.save();
         Assert.assertTrue(contentEquals(configFile, configFile2));
         //Cleanup
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @After
+    public void cleanup() {
         configFile.delete();
         configFile2.delete();
     }

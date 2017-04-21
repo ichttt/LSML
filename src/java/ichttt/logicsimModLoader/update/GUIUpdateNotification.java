@@ -77,7 +77,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         updateAll = new JButton("Update all possible mods");
         updateAll.setToolTipText("Updates all mods that opted in to automatic update.\nNot all mod may be updated this way.");
         updateAll.addActionListener(event -> updateAll());
-        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(context -> context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded()));
+        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
         leftPanel.add(updateAll, lLayout);
 
         rLayout.weighty = 0.03;
@@ -158,7 +158,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         }
         editorPane.setText(buildText(mod, newVersion, changelog, website).replaceAll("\n", NEWLINE_HTML));
         visitURL.setEnabled(website != null);
-        updateMod.setEnabled(context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded());
+        updateMod.setEnabled(context.downloadAvailable());
 
         SwingUtilities.invokeLater(() -> rightScrollPanel.getVerticalScrollBar().setValue(0));
     }
@@ -174,15 +174,23 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
     private void updateAll() {
         List<Mod> failedUpdates = new ArrayList<>();
-        for (UpdateContext ctx : updateMap.keySet()) {
+        for (Map.Entry<UpdateContext, VersionBase> entry : updateMap.entrySet()) {
+            UpdateContext ctx = entry.getKey();
             if (ctx.isDownloaded())
                 continue;
-            if (!UpdateUtil.updateMod(ctx))
+            ctx.getUpdateListener().onUpdateDownloadPre(true);
+            if (!UpdateUtil.updateMod(ctx, entry.getValue()))
                 failedUpdates.add(ctx.linkedModContainer.mod);
         }
-        StringBuilder failedMods = new StringBuilder();
-        failedUpdates.forEach(mod -> failedMods.append(String.format("\nCould not update mod %s (modid %s)", mod.modName(), mod.modid())));
-        JOptionPane.showMessageDialog(dialog, "The following mods failed to update:" + failedMods.toString() + "\nYou have to update these manuel\nThe other mods will be updated during restart");
+        if (failedUpdates.isEmpty()) {
+            updateMod.setEnabled(false);
+            updateAll.setEnabled(false);
+            JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
+        } else {
+            StringBuilder failedMods = new StringBuilder();
+            failedUpdates.forEach(mod -> failedMods.append(String.format("\nCould not update mod %s (modid %s)", mod.modName(), mod.modid())));
+            JOptionPane.showMessageDialog(dialog, "The following mods failed to update:" + failedMods.toString() + "\nYou have to update these manuel\nThe other mods will be updated during restart");
+        }
     }
 
     @Override
@@ -200,10 +208,11 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals("update")) {
-            if (UpdateUtil.updateMod(activeUpdateContext)) {
+            activeUpdateContext.getUpdateListener().onUpdateDownloadPre(false);
+            if (UpdateUtil.updateMod(activeUpdateContext, updateMap.get(activeUpdateContext))) {
                 JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
                 updateMod.setEnabled(false);
-                updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(context -> context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded()));
+                updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
             } else {
                 JOptionPane.showMessageDialog(dialog, "Could not update mod. You have to try manuel");
             }
