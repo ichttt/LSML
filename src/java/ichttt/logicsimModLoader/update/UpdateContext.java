@@ -11,11 +11,11 @@ import java.net.URL;
  * An UpdateContext holds all the information required for the {@link UpdateChecker}
  * @since 0.2.1
  */
-public class UpdateContext {
+public class UpdateContext implements Comparable<UpdateContext> {
     public final ModContainer linkedModContainer;
     public final URL updateURL;
-    private URL downloadURL, changelogURL, pathToRemoteChar, pathToRemoteModinfo;
-    private boolean isFinished;
+    private URL website, changelogURL, pathToRemoteChar, pathToRemoteModinfo;
+    private boolean isFinished, isDownloaded;
 
     public UpdateContext(ModContainer container, URL updateURL) {
         this.linkedModContainer = container;
@@ -27,9 +27,9 @@ public class UpdateContext {
     }
 
     @Nonnull
-    public UpdateContext withDownloadURL(URL downloadURL) {
-        checkNull(this.downloadURL, "DownloadURL is already set!");
-        this.downloadURL = downloadURL;
+    public UpdateContext withWebsite(URL downloadURL) {
+        checkNull(this.website, "DownloadURL is already set!");
+        this.website = downloadURL;
         return this;
     }
 
@@ -49,8 +49,8 @@ public class UpdateContext {
     }
 
     @Nullable
-    public URL getDownloadURL() {
-        return downloadURL;
+    public URL getWebsite() {
+        return website;
     }
 
     @Nullable
@@ -63,8 +63,25 @@ public class UpdateContext {
         return pathToRemoteChar;
     }
 
+    /**
+     * INTERNAL API - DO NOT CALL FROM MOD CODE
+     */
+    public void setDownloaded() {
+        Preconditions.checkNotNull(this.website);
+        this.isDownloaded = true;
+    }
+
+    public boolean isDownloaded() {
+        return isDownloaded;
+    }
+
     @Nullable
     public URL getPathToRemoteModinfo() {
         return pathToRemoteModinfo;
+    }
+
+    @Override
+    public int compareTo(UpdateContext o) {
+        return this.linkedModContainer.mod.modName().compareToIgnoreCase(o.linkedModContainer.mod.modName());
     }
 }

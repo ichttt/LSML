@@ -53,7 +53,6 @@ public class Loader {
         createDirsIfNotExist(modPath, "Successfully create mods folder", "Could not create mod path!");
         createDirsIfNotExist(configPath, "Successfully create config folder", "Could not create config path!");
         createDirsIfNotExist(libPath, null, null);
-        createDirsIfNotExist(tempPath, null, null);
 
         //Load libs. We do this here because something else may need it
         File[] libs = libPath.listFiles();
@@ -101,8 +100,8 @@ public class Loader {
         if (LSMLUtil.isCalledFromModCode()) {
             LSMLLog.error("Mod called search mods. THIS IS NOT ALLOWED!");
             return;
-        } else
-            LSMLLog.fine("Loading mods...");
+        }
+        LSMLLog.fine("Loading mods...");
         File[] files = modPath.listFiles();
         if (files == null) {
             LSMLLog.error("Could not load mods - modPath.listFiles returned null!");
@@ -191,7 +190,7 @@ public class Loader {
         addMod(clazz, new ModContainer((Mod) clazz.getAnnotation(Mod.class)));
     }
 
-    private static void createDirsIfNotExist(File path,@Nullable String successMessage,@Nullable String failMessage) {
+    public static void createDirsIfNotExist(File path,@Nullable String successMessage,@Nullable String failMessage) {
         if (!path.exists()) {
             if (path.mkdirs()) {
                 if (successMessage != null)
@@ -230,6 +229,8 @@ public class Loader {
 
     public void updatePendingMods() {
         List<File> jarsToCopy = new ArrayList<>();
+        if (!tempPath.exists())
+            return;
         for (File f : tempPath.listFiles()) {
             if (!f.isFile())
                 continue;

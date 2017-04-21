@@ -116,23 +116,6 @@ public class UpdateChecker implements Runnable {
                 LSMLUtil.showMessageDialogOnWindowIfAvailable("No updates found");
         }
         else {
-//            StringBuilder noDownload = new StringBuilder();
-//            noDownload.append("Some mods have updates available!");
-//            StringBuilder withDownload = new StringBuilder();
-//            withDownload.append("\nSome Mods can be updated using the automatic downloader");
-//            modWithFoundUpdate.forEach((updateContext, versionBase) -> {
-//                String modName = updateContext.linkedModContainer.mod.modName();
-//                String versionOld = updateContext.linkedModContainer.VERSION.getVersionString();
-//                String versionNew = versionBase.getVersionString();
-//                URL downloadURL = updateContext.getDownloadURL();
-//                String message = String.format("\nMod %s: Installed version is %s, available version is %s", modName, versionOld, versionNew);
-//                if (downloadURL == null)
-//                    noDownload.append(message);
-//                else
-//                    withDownload.append(message);
-//
-//            });
-//            LSMLUtil.showMessageDialogOnWindowIfAvailable(noDownload.toString() + withDownload.toString());
             GUIUpdateNotification notification = new GUIUpdateNotification(modWithFoundUpdate);
         }
         isRunning = false;

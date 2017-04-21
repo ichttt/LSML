@@ -1,5 +1,25 @@
 LSML changelog
 
+
+0.2.1
+ADDED:
+Automatic download for mods if you opt-in for this thing
+NOTE: Localisation support is missing, it will be added in the next release
+
+CHANGED:
+Much better GUI for the UpdateChecker
+
+0.2.0
+ADDED:
+New GlobalDrawEvent
+New booleans to determine the state of LogicSim
+
+CHANGED:
+Updated German localisation
+
+FIXED:
+ConfigParser for ints failing if negative values are allowed
+
 0.1.5
 ADDED:
 New SimpleStorage to provide a simple reference implementation of the ISaveHandler

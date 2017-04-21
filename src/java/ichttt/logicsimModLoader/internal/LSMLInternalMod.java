@@ -43,7 +43,7 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface {
         try {
             event.checkForUpdate(new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
                     withChangelogURL(new URL("https://raw.githubusercontent.com/ichttt/LSML/master/changes.txt")).
-                    withDownloadURL(new URL("https://github.com/ichttt/LSML/releases/latest")));
+                    withWebsite(new URL("https://github.com/ichttt/LSML/releases/latest")));
         } catch (MalformedURLException e) {
             LSMLLog.log("Error registering UpdateChecker. How?", Level.SEVERE, e);
         }

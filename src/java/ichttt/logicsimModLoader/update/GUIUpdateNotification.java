@@ -43,8 +43,10 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     private UpdateContext activeUpdateContext;
 
     public GUIUpdateNotification(Map<UpdateContext, VersionBase> updateMap) {
-        updateMap = new LinkedHashMap<>(updateMap);
-        this.updateMap = updateMap;
+        this.updateMap = new LinkedHashMap<>(updateMap.size());
+        updateMap.entrySet().stream().
+                sorted(Map.Entry.comparingByKey()).
+                forEach(entry -> this.updateMap.put(entry.getKey(), entry.getValue()));
         JPanel leftPanel = new JPanel(new GridBagLayout());
         JScrollPane leftScrollPanel = new JScrollPane(leftPanel);
         leftScrollPanel.setMinimumSize(new Dimension(128, 72));
@@ -58,7 +60,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
         JList<String> list = new JList<>(listModel);
-        updateMap.keySet().forEach(context -> {
+        this.updateMap.keySet().forEach(context -> {
             String modid = context.linkedModContainer.mod.modName();
             listModel.addElement(modid);
             updateList.add(context);
@@ -85,8 +87,8 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         rLayout.anchor = GridBagConstraints.CENTER;
         rLayout.fill = GridBagConstraints.BOTH;
         updateMod = new JButton("Update mod");
-        updateAll.setActionCommand("update");
-        updateAll.addActionListener(this);
+        updateMod.setActionCommand("update");
+        updateMod.addActionListener(this);
         rightOuterPanel.add(updateMod, rLayout);
 
         rLayout.gridx = 2;
@@ -145,7 +147,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         VersionBase newVersion = updateMap.get(context);
         Mod mod = context.linkedModContainer.mod;
         URL changelogURL = context.getChangelogURL();
-        URL downloadURL = context.getDownloadURL();
+        URL website = context.getWebsite();
         String changelog = null;
         if (changelogURL != null) {
             try {
@@ -154,17 +156,17 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
                 LSMLLog.log(String.format("Could not read changelog for mod %s with modid %s", mod.modName(), mod.modid()), Level.WARNING, e);
             }
         }
-        editorPane.setText(buildText(mod, newVersion, changelog, downloadURL).replaceAll("\n", NEWLINE_HTML));
-        visitURL.setEnabled(downloadURL != null);
-        updateMod.setEnabled(context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null);
+        editorPane.setText(buildText(mod, newVersion, changelog, website).replaceAll("\n", NEWLINE_HTML));
+        visitURL.setEnabled(website != null);
+        updateMod.setEnabled(context.getPathToRemoteJar() != null && context.getPathToRemoteModinfo() != null && !context.isDownloaded());
 
         SwingUtilities.invokeLater(() -> rightScrollPanel.getVerticalScrollBar().setValue(0));
     }
 
-    private static String buildText(Mod mod, VersionBase newVersion, @Nullable String changelog, @Nullable URL downloadURL) {
+    private static String buildText(Mod mod, VersionBase newVersion, @Nullable String changelog, @Nullable URL website) {
         String s = String.format("Mod %s (modid %s) has an Update available!\nOld Version was <b>%s</b>, new Version is <b>%s</b>", mod.modName(), mod.modid(), mod.version(), newVersion);
-        if (downloadURL != null)
-            s += "\nDownload-Link: " + "<a href=\"" + downloadURL + "\">" + downloadURL + "</a>";
+        if (website != null)
+            s += "\nWebsite: " + "<a href=\"" + website + "\">" + website + "</a>";
         if (!Strings.isNullOrEmpty(changelog))
             s += "\n\n\nChangelog:\n" + changelog;
         return s;
@@ -173,9 +175,10 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     private void updateAll() {
         List<Mod> failedUpdates = new ArrayList<>();
         for (UpdateContext ctx : updateMap.keySet()) {
-            if (!UpdateUtil.updateMod(ctx)) {
+            if (ctx.isDownloaded())
+                continue;
+            if (!UpdateUtil.updateMod(ctx))
                 failedUpdates.add(ctx.linkedModContainer.mod);
-            }
         }
         StringBuilder failedMods = new StringBuilder();
         failedUpdates.forEach(mod -> failedMods.append(String.format("\nCould not update mod %s (modid %s)", mod.modName(), mod.modid())));
@@ -184,7 +187,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        int index = e.getFirstIndex();
+        int index = ((JList) e.getSource()).getSelectedIndex();
         updateRightComponent(updateList.get(index));
     }
 
@@ -197,12 +200,14 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals("update")) {
-            if (!UpdateUtil.updateMod(activeUpdateContext))
-                JOptionPane.showMessageDialog(dialog, "Could not update mod. You have to try manuel");
-            else
+            if (UpdateUtil.updateMod(activeUpdateContext)) {
                 JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
+                updateMod.setEnabled(false);
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Could not update mod. You have to try manuel");
+            }
         } else if (event.getActionCommand().equals("visit")) {
-            UpdateUtil.openWebsite(activeUpdateContext.getDownloadURL());
+            UpdateUtil.openWebsite(activeUpdateContext.getWebsite());
         } else
             throw new RuntimeException("Invalid actionCommand " + event.getActionCommand());
     }
