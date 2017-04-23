@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update;
 
 import com.google.common.base.Preconditions;
+import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.internal.ModContainer;
 
@@ -17,8 +18,13 @@ public class UpdateContext implements Comparable<UpdateContext> {
     public final URL updateURL;
     private URL website, changelogURL, pathToRemoteJar, pathToRemoteModinfo;
     private boolean isFinished, isDownloaded, noDownload;
-    private IUpdateListener updateListener = new DummyUpdateListener();
+    private IUpdateListener updateListener = DUMMY_INSTANCE;
 
+    /**
+     * Creates the basic context for the new updateChecker
+     * @param container Your mod container
+     * @param updateURL The URL where your information for updating is found. Lines starting with # will be ignored, the first without a '#' <b>must</b> the first line be the modid and the next your up-to-date version
+     */
     public UpdateContext(ModContainer container, URL updateURL) {
         this.linkedModContainer = container;
         this.updateURL = updateURL;
@@ -28,13 +34,21 @@ public class UpdateContext implements Comparable<UpdateContext> {
         Preconditions.checkArgument(obj == null, message);
     }
 
+    /**
+     * Provides your homepage, so users can visit it with a single click
+     * @param website The URL to your homepage.
+     */
     @Nonnull
-    public UpdateContext withWebsite(URL downloadURL) {
+    public UpdateContext withWebsite(URL website) {
         checkNull(this.website, "DownloadURL is already set!");
-        this.website = downloadURL;
+        this.website = website;
         return this;
     }
 
+    /**
+     * Provides a changelog for your mod. You can use html commands in this file.
+     * @param changelogURL The URL to a copy of your up-to-date changelog
+     */
     @Nonnull
     public UpdateContext withChangelogURL(URL changelogURL) {
         checkNull(this.changelogURL, "ChangelogURL is already set!");
@@ -42,6 +56,12 @@ public class UpdateContext implements Comparable<UpdateContext> {
         return this;
     }
 
+    /**
+     * Enables the auto-download feature on your mod. You have to do nothing but register it here and update the remote
+     * files
+     * @param pathToRemoteJar The URL where your updated mod jar is found
+     * @param pathToRemoteModinfo The URL where your updated modinfo is found
+     */
     @Nonnull
     public UpdateContext enableAutoUpdate(URL pathToRemoteJar, URL pathToRemoteModinfo) {
         checkNull(this.pathToRemoteJar, "Path to remote JAR is already set!");
@@ -51,8 +71,10 @@ public class UpdateContext implements Comparable<UpdateContext> {
     }
 
     /**
-     * Most mods shouldn't use this. <b>Only use this if you know what you are doing.</b>
-     * <br>LSML needs this because it isn't a mod.
+     * Most mods shouldn't use this. <b>Only use this if you know what you are doing.</b>.LSML needs this because it isn't a mod.
+     * <br>If you set this, you will be excluded from the automatic downloader, but the user can still download and the
+     * events on the {@link IUpdateListener} will still be called.
+     * You have to download and update yourself when {@link IUpdateListener#onUpdateDownloadPost(VersionBase)} is called
      * @param takeCareAboutDownloadYourself True to ensure that you take care about the button press yourself
      */
     public UpdateContext enableAutoUpdate(boolean takeCareAboutDownloadYourself) {
@@ -62,10 +84,12 @@ public class UpdateContext implements Comparable<UpdateContext> {
     }
 
     /**
+     * Registers an UpdateListener as specified in {@link IUpdateListener}
      * @since 0.2.2
      */
     @Nonnull
     public UpdateContext registerUpdateListener(IUpdateListener listener) {
+        Preconditions.checkArgument(this.updateListener == DUMMY_INSTANCE, "UpdateListener is already set!");
         this.updateListener = listener;
         return this;
     }
@@ -89,10 +113,7 @@ public class UpdateContext implements Comparable<UpdateContext> {
         return ((this.pathToRemoteJar != null && this.pathToRemoteModinfo != null) || this.noDownload)&& !this.isDownloaded;
     }
 
-    /**
-     * INTERNAL API - DO NOT CALL FROM MOD CODE
-     */
-    public void setDownloaded() {
+    void setDownloaded() {
         Preconditions.checkNotNull(this.website);
         this.isDownloaded = true;
     }
@@ -120,5 +141,5 @@ public class UpdateContext implements Comparable<UpdateContext> {
         return this.linkedModContainer.mod.modName().compareToIgnoreCase(o.linkedModContainer.mod.modName());
     }
 
-    private static final class DummyUpdateListener implements IUpdateListener {}
+    private static final IUpdateListener DUMMY_INSTANCE = new IUpdateListener(){};
 }

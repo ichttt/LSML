@@ -6,7 +6,7 @@ import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.update.UpdateUtil;
 
 /**
- * Created by Tobias on 22.04.2017.
+ * Thread for updating a single mod. Avoids lockup on the GUI thread.
  */
 public class UpdateThreadSingleObject implements Runnable {
     private final VersionBase newVersion;
@@ -21,6 +21,7 @@ public class UpdateThreadSingleObject implements Runnable {
 
     @Override
     public void run() {
+        ctx.getUpdateListener().onUpdateDownloadPre(false);
         notification.callbackSingleUpdateState(ctx, UpdateUtil.updateMod(ctx, newVersion));
     }
 }

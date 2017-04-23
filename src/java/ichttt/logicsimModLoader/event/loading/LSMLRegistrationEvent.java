@@ -32,17 +32,6 @@ public class LSMLRegistrationEvent {
     }
 
     /**
-     * @deprecated Use {@link #registerModGui(Mod, IModGuiInterface)} instead, as this is unsafe!
-     * @param guiInterface Your guiInterface
-     */
-    @Deprecated
-    public void registerModGui(IModGuiInterface guiInterface) {
-        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        Preconditions.checkNotNull(mod, "Failed to get ModContainer!");
-        ModListGui.registerModGui(mod, guiInterface);
-    }
-
-    /**
      * Registers your guiInterface to be shown in the mods list
      * @param yourMod Your mod. You may get it by parsing the class to {@link LSMLUtil#getModAnnotationForClass(Class)}
      * @param guiInterface Your guiInterface
@@ -51,25 +40,8 @@ public class LSMLRegistrationEvent {
         ModListGui.registerModGui(yourMod, guiInterface);
     }
 
-    @Deprecated
-    public void registerSaveHandler(ISaveHandler handler) {
-        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        Preconditions.checkNotNull(mod, "Failed to get ModContainer!");
-        SaveHandler.registerSaveHandler(mod, handler);
-    }
-
     public void registerSaveHandler(Mod yourMod, ISaveHandler handler) {
         SaveHandler.registerSaveHandler(yourMod, handler);
-    }
-
-    /**
-     * @since 0.0.4
-     */
-    @Deprecated
-    public void checkForUpdate(URL updateURL) {
-        Mod mod = LSMLUtil.getActiveModFromCurrentThread();
-        Preconditions.checkNotNull(mod, "Failed to get ModContainer!");
-        checkForUpdate(Loader.getInstance().getModContainerForModID(mod.modid()), updateURL);
     }
 
     /**
@@ -80,7 +52,7 @@ public class LSMLRegistrationEvent {
     public void checkForUpdate(ModContainer yourMod, URL updateURL) {
         Preconditions.checkNotNull(yourMod);
         Preconditions.checkNotNull(updateURL);
-        UpdateChecker.register(yourMod, updateURL);
+        UpdateChecker.register(new UpdateContext(yourMod, updateURL));
     }
 
     public void checkForUpdate(UpdateContext context) {

@@ -18,6 +18,10 @@ import java.util.logging.Level;
  * Various utils needed for the new {@link UpdateChecker}
  */
 public class UpdateUtil {
+
+    /**
+     * Updates a mod. Please do not call this directly if you don't know what your doing, as this may take a while.
+     */
     public static boolean updateMod(UpdateContext ctx, VersionBase newVersion) {
         ModContainer container = ctx.linkedModContainer;
         if (ctx.noDownloading()) {
@@ -69,6 +73,10 @@ public class UpdateUtil {
         return true;
     }
 
+    /**
+     * Opens a Website using java.awt.Desktop
+     * @param website The URl to the website to open
+     */
     public static void openWebsite(URL website) {
         if (Desktop.isDesktopSupported()) {
             try {

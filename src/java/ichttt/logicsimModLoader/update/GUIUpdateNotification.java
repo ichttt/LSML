@@ -32,7 +32,7 @@ import java.util.logging.Level;
 
 /**
  * The new UpdateNotification window introduced in 0.2.1
- *
+ * @since 0.2.1
  */
 public class GUIUpdateNotification implements ListSelectionListener, HyperlinkListener, ActionListener {
     private static final String NEWLINE_HTML = "<br>";
@@ -234,7 +234,6 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals("update")) {
-            activeUpdateContext.getUpdateListener().onUpdateDownloadPre(false);
             UpdateThreadSingleObject threadSingleObject = new UpdateThreadSingleObject(activeUpdateContext, updateMap.get(activeUpdateContext), this);
             constructAndRunUpdateThread(threadSingleObject);
         } else if (event.getActionCommand().equals("visit"))

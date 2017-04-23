@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Tobias on 23.04.2017.
+ * Thread to update a single mod. Avoids lockup on the GUI thread.
  */
 public class UpdateThreadMultiObjects implements Runnable {
     private final Map<UpdateContext, VersionBase> updateMap;
