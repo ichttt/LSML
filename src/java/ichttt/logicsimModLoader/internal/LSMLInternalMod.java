@@ -3,7 +3,6 @@ package ichttt.logicsimModLoader.internal;
 import com.google.common.eventbus.Subscribe;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.IUpdateListener;
-import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.ConfigCategory;
@@ -13,13 +12,14 @@ import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.update.UpdateChecker;
 import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 import ichttt.logicsimModLoader.util.NetworkHelper;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -56,13 +56,17 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
         Loader.createDirsIfNotExist(loader.tempPath, null, "Could not create temp path!");
         File file = new File(loader.tempPath + "/LSMLUPDATE.zip");
         File supposedLSMLFile = new File(loader.tempPath + "/LSMLUPDATE/LSML.jar");
-        file.deleteOnExit();
         try {
             NetworkHelper.readFileFromURL(downloadURl, file);
             LSMLUtil.unzipZipFile(file, new File(loader.tempPath + "/LSMLUPDATE"));
-            if (!supposedLSMLFile.exists()) throw new IOException("Could not find File!");
-            Files.copy(supposedLSMLFile.toPath(), new File(loader.basePath.toString() + "/LSMLv" + newVersion + ".jar").toPath());
+            if (!supposedLSMLFile.exists())
+                throw new IOException("Could not find File!");
+            String newFileName = "/LSMLv" + newVersion + ".jar";
+            Files.copy(supposedLSMLFile.toPath(), new File(loader.basePath.toString() + newFileName).toPath());
+            JOptionPane.showMessageDialog(null, "LSML has been updated. Please start " + newFileName + " to launch the new version");
         } finally {
+            if (!file.delete())
+                LSMLLog.fine("Could not clean up " + file.getName());
             Path directory = Paths.get(loader.tempPath + "/LSMLUPDATE");
             Files.walkFileTree(directory, new SimpleFileVisitor<Path>() { //http://stackoverflow.com/questions/779519/delete-directories-recursively-in-java/27917071#27917071
                 @Override

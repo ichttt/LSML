@@ -4,9 +4,7 @@ import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.swing.*;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 
 /**
  * @since 0.0.4

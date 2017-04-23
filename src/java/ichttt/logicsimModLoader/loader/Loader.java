@@ -228,9 +228,9 @@ public class Loader {
     }
 
     public void updatePendingMods() {
-        List<File> jarsToCopy = new ArrayList<>();
         if (!tempPath.exists())
             return;
+        List<File> jarsToCopy = new ArrayList<>();
         for (File f : tempPath.listFiles()) {
             if (!f.isFile())
                 continue;

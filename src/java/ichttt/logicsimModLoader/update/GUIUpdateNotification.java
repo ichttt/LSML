@@ -5,6 +5,8 @@ import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
+import ichttt.logicsimModLoader.update.threads.UpdateThreadMultiObjects;
+import ichttt.logicsimModLoader.update.threads.UpdateThreadSingleObject;
 import ichttt.logicsimModLoader.util.NetworkHelper;
 import logicsim.App;
 
@@ -17,9 +19,12 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +38,11 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     private static final String NEWLINE_HTML = "<br>";
 
     private final Map<UpdateContext, VersionBase> updateMap;
+    private final Map<UpdateContext, String> textCache = new HashMap<>();
     private final List<UpdateContext> updateList = new ArrayList<>();
     private final JEditorPane editorPane = new JEditorPane();
     private final JScrollPane rightScrollPanel;
-    private final JDialog dialog;
+    private final JDialog dialog, updateDiag;
     private final JButton updateMod, updateAll, visitURL;
 
     private UpdateContext activeUpdateContext;
@@ -136,27 +142,51 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         dialog.setPreferredSize(preferredSize);
         dialog.pack();
         updateRightComponent(updateList.get(0));
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        dialog.setLocation((screenSize.width - dialog.getWidth())/ 2 , (screenSize.height - dialog.getHeight())/2);
-        dialog.setVisible(true);
+        centerComponent(dialog);
+
+        updateDiag = new JDialog(parent);
+        updateDiag.setTitle("Updating, please wait");
+        updateDiag.setMinimumSize(new Dimension((int) Math.round(dialog.getPreferredSize().width *0.25), (int) Math.round(dialog.getPreferredSize().height *0.2)));
+        JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        updateDiag.add(bar);
+        updateDiag.pack();
+        updateDiag.setModal(true);
+        updateDiag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        centerComponent(updateDiag);
+
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                updateDiag.dispose();
+            }
+        });
+
     }
 
     private void updateRightComponent(UpdateContext context) {
         activeUpdateContext = context;
-        VersionBase newVersion = updateMap.get(context);
-        Mod mod = context.linkedModContainer.mod;
-        URL changelogURL = context.getChangelogURL();
         URL website = context.getWebsite();
-        String changelog = null;
-        if (changelogURL != null) {
-            try {
-                changelog = NetworkHelper.readURLUncached(changelogURL);
-            } catch (IOException e) {
-                LSMLLog.log(String.format("Could not read changelog for mod %s with modid %s", mod.modName(), mod.modid()), Level.WARNING, e);
+        String s = textCache.get(context);
+        if (s == null) {
+            VersionBase newVersion = updateMap.get(context);
+            Mod mod = context.linkedModContainer.mod;
+            URL changelogURL = context.getChangelogURL();
+            String changelog = null;
+            if (changelogURL != null) {
+                try {
+                    changelog = NetworkHelper.readURLUncached(changelogURL);
+                } catch (IOException e) {
+                    LSMLLog.log(String.format("Could not read changelog for mod %s with modid %s", mod.modName(), mod.modid()), Level.WARNING, e);
+                }
             }
+            s = buildText(mod, newVersion, changelog, website).replaceAll("\n", NEWLINE_HTML);
+            textCache.put(context, s);
         }
-        editorPane.setText(buildText(mod, newVersion, changelog, website).replaceAll("\n", NEWLINE_HTML));
+        editorPane.setText(s);
         visitURL.setEnabled(website != null);
         updateMod.setEnabled(context.downloadAvailable());
 
@@ -172,30 +202,26 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         return s;
     }
 
+    private static void centerComponent(Window comp) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        comp.setLocation((screenSize.width - comp.getWidth())/ 2 , (screenSize.height - comp.getHeight())/2);
+    }
+
+    private void constructAndRunUpdateThread(Runnable runnable) {
+        SwingUtilities.invokeLater(() -> updateDiag.setVisible(true));
+        Thread thread = new Thread(runnable);
+        thread.setName("Update thread");
+        thread.start();
+    }
+
     private void updateAll() {
-        List<Mod> failedUpdates = new ArrayList<>();
-        for (Map.Entry<UpdateContext, VersionBase> entry : updateMap.entrySet()) {
-            UpdateContext ctx = entry.getKey();
-            if (ctx.isDownloaded())
-                continue;
-            ctx.getUpdateListener().onUpdateDownloadPre(true);
-            if (!UpdateUtil.updateMod(ctx, entry.getValue()))
-                failedUpdates.add(ctx.linkedModContainer.mod);
-        }
-        if (failedUpdates.isEmpty()) {
-            updateMod.setEnabled(false);
-            updateAll.setEnabled(false);
-            JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
-        } else {
-            StringBuilder failedMods = new StringBuilder();
-            failedUpdates.forEach(mod -> failedMods.append(String.format("\nCould not update mod %s (modid %s)", mod.modName(), mod.modid())));
-            JOptionPane.showMessageDialog(dialog, "The following mods failed to update:" + failedMods.toString() + "\nYou have to update these manuel\nThe other mods will be updated during restart");
-        }
+        UpdateThreadMultiObjects threadMultiObjects = new UpdateThreadMultiObjects(updateMap, this);
+        constructAndRunUpdateThread(threadMultiObjects);
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
-        int index = ((JList) e.getSource()).getSelectedIndex();
+    public void valueChanged(ListSelectionEvent event) {
+        int index = ((JList) event.getSource()).getSelectedIndex();
         updateRightComponent(updateList.get(index));
     }
 
@@ -209,16 +235,28 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals("update")) {
             activeUpdateContext.getUpdateListener().onUpdateDownloadPre(false);
-            if (UpdateUtil.updateMod(activeUpdateContext, updateMap.get(activeUpdateContext))) {
-                JOptionPane.showMessageDialog(dialog, "Update successful! It will be applied at the next startup!");
-                updateMod.setEnabled(false);
-                updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Could not update mod. You have to try manuel");
-            }
-        } else if (event.getActionCommand().equals("visit")) {
+            UpdateThreadSingleObject threadSingleObject = new UpdateThreadSingleObject(activeUpdateContext, updateMap.get(activeUpdateContext), this);
+            constructAndRunUpdateThread(threadSingleObject);
+        } else if (event.getActionCommand().equals("visit"))
             UpdateUtil.openWebsite(activeUpdateContext.getWebsite());
-        } else
+        else
             throw new RuntimeException("Invalid actionCommand " + event.getActionCommand());
+    }
+
+    private void callbackBaseTasks(UpdateContext ctx) {
+        SwingUtilities.invokeLater(() -> updateDiag.setVisible(false));
+        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
+        updateRightComponent(ctx);
+    }
+
+    public void callbackSingleUpdateState(UpdateContext ctx, boolean success) {
+        callbackBaseTasks(ctx);
+        String text = success ? "Update successful! It will be applied at the next startup!" : "Could not update mod. You have to try manuel";
+        SwingUtilities.invokeLater(() ->JOptionPane.showMessageDialog(dialog, text));
+    }
+
+    public void callbackMultiUpdateState(String notification) {
+        callbackBaseTasks(activeUpdateContext);
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, notification));
     }
 }
