@@ -1,5 +1,13 @@
 LSML changelog
 
+0.2.2
+ADDED:
+Automatic download support for LSML
+new UpdateListener
+Documentation
+
+CHANGED:
+Clean up code from 0.2.1 a bit
 
 0.2.1
 ADDED:
