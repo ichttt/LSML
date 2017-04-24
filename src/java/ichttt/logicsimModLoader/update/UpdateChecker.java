@@ -24,7 +24,7 @@ import java.util.logging.Level;
  * Basic update checker.
  * This does not download the mod, it will only show that a update is available
  * A good place for this metadata is a github raw
- * @since 0.2.1 (Was before {@link ichttt.logicsimModLoader.UpdateChecker}
+ * @since 0.2.1
  */
 public class UpdateChecker implements Runnable {
     private static Map<UpdateContext, VersionBase> modWithFoundUpdate = new HashMap<>();

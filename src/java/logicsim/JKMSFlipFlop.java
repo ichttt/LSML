@@ -37,21 +37,21 @@ public class JKMSFlipFlop extends ModularGate{
 
     // Eingang 0 dieses Moduls auf Eingang 0 des Gatters jk1 setzen
     inputGates.setElementAt(jk1, 0);
-    inputNums.setElementAt(new Integer(0), 0);
+    inputNums.setElementAt(0, 0);
     // Eingang 1 dieses Moduls auf Eingang 0 des Gatters clk setzen
     inputGates.setElementAt(clk, 1);
-    inputNums.setElementAt(new Integer(0), 1);
+    inputNums.setElementAt(0, 1);
     // Eingang 2 dieses Moduls auf Eingang 2 des Gatters jk1 setzen
     inputGates.setElementAt(jk1, 2);
-    inputNums.setElementAt(new Integer(2), 2);
+    inputNums.setElementAt(2, 2);
 
 
     // Ausgang 0 dieses Moduls auf Ausgang 0 des Gatters jk2 setzen
     outputGates.setElementAt(jk2, 0);
-    outputNums.setElementAt(new Integer(0), 0);
+    outputNums.setElementAt(0, 0);
     // Ausgang 1 dieses Moduls auf Ausgang 1 des Gatters jk2 setzen
     outputGates.setElementAt(jk2, 1);
-    outputNums.setElementAt(new Integer(1), 1);
+    outputNums.setElementAt(1, 1);
   }
 
   public int getNumInput() {

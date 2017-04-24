@@ -38,7 +38,7 @@ public class HTMLHelp extends javax.swing.JFrame implements java.awt.event.Actio
                 ( scrSize.height / 2 ) - ( height / 2 ) );
         setSize( width, height );
         this.setTitle("LogicSim Help");
-        this.show();
+        this.setVisible(true);
         
         try {
             String url=null;
@@ -64,7 +64,7 @@ public class HTMLHelp extends javax.swing.JFrame implements java.awt.event.Actio
             jTextPane1.setPage(url);
         } catch (Exception ex) {
             ex.printStackTrace();
-            this.hide();
+            this.setVisible(false);
             this.dispose();
         }
         
@@ -74,7 +74,7 @@ public class HTMLHelp extends javax.swing.JFrame implements java.awt.event.Actio
         super.processMouseEvent(e);
         int id = e.getID();
         if (id==MouseEvent.MOUSE_CLICKED) {
-            this.hide();
+            this.setVisible(false);
             this.dispose();
         }
     }
@@ -120,7 +120,7 @@ public class HTMLHelp extends javax.swing.JFrame implements java.awt.event.Actio
     
     private void jButton_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_okActionPerformed
         this.dispose();
-        this.hide();
+        this.setVisible(false);
     }//GEN-LAST:event_jButton_okActionPerformed
     
     

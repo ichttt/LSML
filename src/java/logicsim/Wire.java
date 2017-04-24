@@ -21,13 +21,13 @@ public class Wire implements Serializable, Cloneable{
   public transient int outNum;    // die Nummer des Ausgangs des Gatters, an das dieses Wire angeschlossen ist
   transient boolean active;
   Polygon poly;
-  Vector nodes;  /* enth�lt f�r jeden Punkt des Polygons einen Boolean Objekt, welches angibt, ob der
+  Vector<Boolean> nodes;  /* enth�lt f�r jeden Punkt des Polygons einen Boolean Objekt, welches angibt, ob der
                     Punkt als Node gezeichnet werden soll.  nodes.size == poly.npoints  */
 
   public Wire(Gate g, int n) {
     gate=g;
     poly=new Polygon();
-    nodes=new Vector();
+    nodes=new Vector<>();
     outNum=n;
     active=true;
   }
@@ -36,8 +36,8 @@ public class Wire implements Serializable, Cloneable{
     poly.addPoint(x,y);
     nodes.setSize(poly.npoints);
     for (int i=0; i<nodes.size(); i++) {
-      Boolean b=(Boolean)nodes.get(i);
-      if (b==null) nodes.setElementAt(new Boolean(false), i);
+      Boolean b= nodes.get(i);
+      if (b==null) nodes.setElementAt(Boolean.FALSE, i);
     }
   }
 
@@ -113,8 +113,8 @@ public class Wire implements Serializable, Cloneable{
       g2.setColor(Color.black);
 
       // node zeichnen
-      Boolean b=(Boolean)nodes.get(i);
-      if (b!=null && b.booleanValue())
+      Boolean b= nodes.get(i);
+      if (b!=null && b)
         g2.fillRect(poly.xpoints[i]-2, poly.ypoints[i]-2, 5, 5);
     }
 
@@ -176,7 +176,7 @@ public class Wire implements Serializable, Cloneable{
 
   public void setNode(int p) {
     if (p>0 && p<poly.npoints)
-      nodes.setElementAt(new Boolean(true), p);
+      nodes.setElementAt(Boolean.TRUE, p);
   }
 
   /** wenn an (mx,my) ein Punkt des Wires liegt, wird dieser als Node markiert */
@@ -198,10 +198,11 @@ public class Wire implements Serializable, Cloneable{
     try {
       clone=(Wire)super.clone();
     } catch (CloneNotSupportedException e) {
-      throw new InternalError();
+      throw new InternalError(e);
     }
     // Kopie von poly & nodes anlegen, Gate bleibt die selbe Referenz wie beim Original
     clone.poly=new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
+    //noinspection unchecked
     clone.nodes=(Vector)nodes.clone();
     return clone;
   }

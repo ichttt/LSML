@@ -55,7 +55,7 @@ public class MonoFlop extends Gate {
   public boolean showProperties(Component frame) {
     String h = (String)JOptionPane.showInputDialog(frame, I18N.getString("MESSAGE_ENTER_TIME_HIGH"), I18N.getString("GATE_MONOFLOP_PROPERTIES"),
                                                     JOptionPane.QUESTION_MESSAGE, null,null, Integer.toString((int)highTime));
-    if (h!=null && h.length()>0) highTime=new Integer(h).intValue();
+    if (h!=null && h.length()>0) highTime= new Integer(h);
     return true;
   }
 

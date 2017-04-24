@@ -93,8 +93,7 @@ public class Module extends Gate{
     
     
     public void simulate() {
-        for (int i=0; i<16; i++)
-            ModIn.inputTypes[i]=inputTypes[i];
+        System.arraycopy(inputTypes, 0, ModIn.inputTypes, 0, 16);
         
         
         if (gates!=null) gates.simulate();
@@ -183,7 +182,7 @@ public class Module extends Gate{
             //AffineTransform at = g2.getTransform();
             //g2.rotate(Math.PI*1.5, x+gateimagewidth/2+10, y+gateimageheight/2);
             g.setClip(x,y,gateimagewidth,gateimageheight);
-            String str=new String(((MODIN)ModIn).ModuleLabel);
+            String str= ((MODIN) ModIn).ModuleLabel;
             g.setColor(Color.black);
             g.drawString(str, x+7, y+20);
             g.setClip(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE);

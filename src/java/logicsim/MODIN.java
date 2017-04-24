@@ -33,10 +33,10 @@ public class MODIN extends Gate {
   public MODIN() {
     super();
     imagename="input";
-    ModuleName=new String();
-    ModuleDescription=new String();
-    ModuleLabel=new String();
-    ModuleImageName=new String();
+    ModuleName= "";
+    ModuleDescription= "";
+    ModuleLabel= "";
+    ModuleImageName= "";
   }
 
 
@@ -61,7 +61,7 @@ public class MODIN extends Gate {
   }  
   
   public boolean showProperties(Component frame) {
-    String NameBak=new String(ModuleName);
+    String NameBak= ModuleName;
 
     JPanel panel = new JPanel();
 
@@ -103,16 +103,16 @@ public class MODIN extends Gate {
     JDialog dlg=pane.createDialog(frame, I18N.getString("MENU_MODULEPROPERTIES"));
     dlg.setResizable(true);
     dlg.setSize(400,350);
-    dlg.show();
-    if (I18N.getString("BUTTON_USE") == (String)pane.getValue()) {
-      ModuleName=new String(jTextField_name.getText());
-      ModuleDescription=new String(jTextArea_description.getText());
-      ModuleLabel=new String(jTextField_label.getText());
-      ModuleImageName=new String(jTextField_image.getText());
+    dlg.setVisible(true);
+    if (Objects.equals(I18N.getString("BUTTON_USE"), (String) pane.getValue())) {
+      ModuleName= jTextField_name.getText();
+      ModuleDescription= jTextArea_description.getText();
+      ModuleLabel= jTextField_label.getText();
+      ModuleImageName= jTextField_image.getText();
 
       if (ModuleName.length()==0) return false;
 
-      if (ModuleName != NameBak && NameBak.length()>0) {
+      if (!Objects.equals(ModuleName, NameBak) && NameBak.length()>0) {
         File f=new File(App.getModulePath() + NameBak + ".mod");
         f.renameTo(new File(App.getModulePath() + ModuleName + ".mod"));
       }

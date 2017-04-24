@@ -42,7 +42,7 @@ public class Splash extends JWindow  implements Runnable {
     thread.setPriority(Thread.MAX_PRIORITY);
     thread.start();
 
-    show ();
+    setVisible(true);
     toFront ();
   }
 
@@ -66,7 +66,7 @@ public class Splash extends JWindow  implements Runnable {
 
       toFront();
     }
-    hide();
+    setVisible(false);
   }
 
   class SplashPanel extends JPanel

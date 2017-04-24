@@ -38,14 +38,14 @@ public class TFlipFlop extends ModularGate{
 
     // Eingang 0 dieses Moduls auf Eingang 0 des Gatters clk setzen
     inputGates.setElementAt(clk, 0);
-    inputNums.setElementAt(new Integer(0), 0);
+    inputNums.setElementAt(0, 0);
 
     // Ausgang 0 dieses Moduls auf Ausgang 0 des Gatters jk2 setzen
     outputGates.setElementAt(jk2, 0);
-    outputNums.setElementAt(new Integer(0), 0);
+    outputNums.setElementAt(0, 0);
     // Ausgang 1 dieses Moduls auf Ausgang 1 des Gatters jk2 setzen
     outputGates.setElementAt(jk2, 1);
-    outputNums.setElementAt(new Integer(1), 1);
+    outputNums.setElementAt(1, 1);
   }
 
   public int getNumInput() {

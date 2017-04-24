@@ -49,17 +49,17 @@ public class DFlipFlop extends ModularGate{
    
     // Eingang 0 dieses Moduls auf Eingang 0 des Gatters d setzen
     inputGates.setElementAt(d, 0);
-    inputNums.setElementAt(new Integer(0), 0);
+    inputNums.setElementAt(0, 0);
     // Eingang 1 dieses Moduls auf Eingang 0 des Gatters clk setzen
     inputGates.setElementAt(clk, 1);
-    inputNums.setElementAt(new Integer(0), 1);
+    inputNums.setElementAt(0, 1);
 
     // Ausgang 0 dieses Moduls auf Ausgang 0 des Gatters rs setzen
     outputGates.setElementAt(jk, 0);
-    outputNums.setElementAt(new Integer(0), 0);
+    outputNums.setElementAt(0, 0);
     // Ausgang 1 dieses Moduls auf Ausgang 1 des Gatters rs setzen
     outputGates.setElementAt(jk, 1);
-    outputNums.setElementAt(new Integer(1), 1);
+    outputNums.setElementAt(1, 1);
   }
 
   public int getNumInput() {

@@ -55,18 +55,18 @@ public class GateList implements Serializable {
   }
 
   public Gate get(int n) {
-    return (Gate)gates.get(n);
+    return gates.get(n);
   }
 
   public void simulate() {
     for (int j=0; j<2; j++) {
       for (int i=0; i<gates.size(); i++) {
-        Gate g = (Gate)gates.get(i);
+        Gate g = gates.get(i);
         g.simulate();
       }
     }
     for (int i=0; i<gates.size(); i++) {
-        Gate g = (Gate)gates.get(i);
+        Gate g = gates.get(i);
         g.clock();
       }
   }
@@ -81,14 +81,14 @@ public class GateList implements Serializable {
    */
   public void reconnect() {
     for (int i=0; i<size(); i++) {
-      Gate g=(Gate)gates.get(i);
+      Gate g= gates.get(i);
       
       //for (int j=0; j<g.getNumInput(); j++) {  // Geändert, damit Module mit 16 Eingängen funktionieren
       for (int j=0; j<16; j++) {
         Wire w=g.getInput(j);
         if (w!=null) {
           for (int k=0; k<size(); k++) {
-            Gate ng=(Gate)gates.get(k);
+            Gate ng= gates.get(k);
             Wire nw = ng.tryConnectOutput(w.poly.xpoints[0], w.poly.ypoints[0]);
             if (nw!=null) {
               w.gate=nw.gate;
@@ -112,7 +112,7 @@ public class GateList implements Serializable {
   // Alle Gatter und zugeh�rige Wires deaktivieren
   public void deactivateAll() {
     for (int i=0; i<gates.size(); i++) {
-      Gate g=(Gate)gates.get(i);
+      Gate g= gates.get(i);
       g.deactivate();
       for (int j=0; j<g.getNumInput(); j++) {
         if (g.getInput(j)!=null)
@@ -123,7 +123,7 @@ public class GateList implements Serializable {
 
   public void printInfo() {
     for (int i=0; i<size(); i++) {
-      Gate g=(Gate)get(i);
+      Gate g= get(i);
       g.printInfo();
     }
   }
@@ -131,7 +131,7 @@ public class GateList implements Serializable {
   public void reloadImages() {
       // alle Gate-Bilder neu laden, nachdem das Design umgestellt wurde
       for (int i=0; i<gates.size(); i++) {
-          Gate g=(Gate)gates.get(i);
+          Gate g= gates.get(i);
           g.loadImage();
       }
   }

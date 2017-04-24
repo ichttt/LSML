@@ -118,8 +118,8 @@ public class SWITCH extends Gate {
     JDialog dlg=pane.createDialog(frame, I18N.getString("GATE_SWITCH_TYPE"));
     dlg.setResizable(true);
     dlg.setSize(290,180);
-    dlg.show();
-    if (I18N.getString("BUTTON_USE").equals((String)pane.getValue())) {
+    dlg.setVisible(true);
+    if (I18N.getString("BUTTON_USE").equals(pane.getValue())) {
       if (jRadioButton1.isSelected())
         click=false;
       else if (jRadioButton2.isSelected())

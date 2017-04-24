@@ -57,8 +57,8 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     JPanel jPanel1 = new JPanel();
     JPanel jPanel_gates = new JPanel();
     
-    DefaultListModel jList_gates_model = new DefaultListModel();
-    JList jList_gates = new JList(jList_gates_model);
+    DefaultListModel<Object> jList_gates_model = new DefaultListModel<>();
+    JList jList_gates = new JList<>(jList_gates_model);
     public final LSPanel lspanel = new LSPanel(statusBar); //LSML: make public and final. If you need other fields, use reflection
     JScrollPane jScrollPane_lspanel = new JScrollPane(lspanel);
     JSplitPane jSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
@@ -87,7 +87,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     JMenuItem jMenuItem_print = new JMenuItem();
     BorderLayout borderLayout2 = new BorderLayout();
     JPanel jPanel2 = new JPanel();
-    JComboBox jComboBox_numinput = new JComboBox(gateInputNums);
+    JComboBox<String> jComboBox_numinput = new JComboBox<>(gateInputNums);
     BorderLayout borderLayout3 = new BorderLayout();
     JButton jButton_addpoint = new JButton();
     JMenuItem jMenuItem_new = new JMenuItem();
@@ -463,7 +463,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         if (!(sim!=null && sim.running)) {
             lspanel.gates.simulate();
             for (int i=0; i<lspanel.gates.size(); i++) {
-                Gate g = (Gate)lspanel.gates.get(i);
+                Gate g = lspanel.gates.get(i);
                 g.reset();
             }
             
@@ -764,7 +764,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
                 switch(a) {
                     case LSPanel.ACTION_AND: case LSPanel.ACTION_NAND: case LSPanel.ACTION_OR:
                     case LSPanel.ACTION_NOR: case LSPanel.ACTION_XOR: case LSPanel.ACTION_EQU:
-                        lspanel.setAction(a,new Integer(jComboBox_numinput.getSelectedItem().toString().substring(0,1)).intValue()); break;
+                        lspanel.setAction(a, new Integer(jComboBox_numinput.getSelectedItem().toString().substring(0, 1))); break;
                     default: lspanel.setAction(a); break;
                 }
             }

@@ -158,8 +158,8 @@ public class BININ extends Gate{
     JDialog dlg=pane.createDialog(frame, I18N.getString("GATE_BINARYINPUT_PROPERTIES"));
     dlg.setResizable(true);
     dlg.setSize(290,180);
-    dlg.show();
-    if (I18N.getString("BUTTON_USE").equals((String)pane.getValue())) {
+    dlg.setVisible(true);
+    if (I18N.getString("BUTTON_USE").equals(pane.getValue())) {
       if (jRadioButton1.isSelected())
         displayType=0;
       else if (jRadioButton2.isSelected())

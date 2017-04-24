@@ -21,27 +21,27 @@ public abstract class ModularGate extends Gate{
 
   transient GateList gates;  // Gatter des Moduls nicht mit abspeichern, die werden nach dem Laden neu erzeugt
 
-  Vector inputGates;  // die Gatter, die an den Eingang dieses Moduls angeschlossen sind
-  Vector inputNums;  // die jeweilige Nummer des Eingangs der inputGates
-  Vector outputGates;  // die Gatter, die die Ausgangswerte f�r dieses Modul bilden
-  Vector outputNums; // die jeweilige Nummer des Ausgangs der outputGates
+  Vector<Gate> inputGates;  // die Gatter, die an den Eingang dieses Moduls angeschlossen sind
+  Vector<Integer> inputNums;  // die jeweilige Nummer des Eingangs der inputGates
+  Vector<Gate> outputGates;  // die Gatter, die die Ausgangswerte f�r dieses Modul bilden
+  Vector<Integer> outputNums; // die jeweilige Nummer des Ausgangs der outputGates
 
   public ModularGate() {
     super();
     gates=new GateList();
 
-    inputGates=new Vector(16);
+    inputGates=new Vector<>(16);
     for (int i=0; i<16; i++)
       inputGates.addElement(null);
-    inputNums=new Vector(16);
+    inputNums=new Vector<>(16);
     for (int i=0; i<16; i++)
-      inputNums.addElement(new Integer(0));
-    outputGates=new Vector(16);
+      inputNums.addElement(0);
+    outputGates=new Vector<>(16);
     for (int i=0; i<16; i++)
       outputGates.addElement(null);
-    outputNums=new Vector(16);
+    outputNums=new Vector<>(16);
     for (int i=0; i<16; i++)
-      outputNums.addElement(new Integer(0));
+      outputNums.addElement(0);
 
     createModule();
   }
@@ -52,11 +52,11 @@ public abstract class ModularGate extends Gate{
   public void simulate() {
     // inputTypes der inputGates auf den entsprechenden inputType des ModularGate setzen
     for (int i=0; i<inputGates.size(); i++) {
-      Gate g=(Gate)inputGates.get(i);
+      Gate g= inputGates.get(i);
       if (g==null) continue;
-      Integer in=(Integer)inputNums.get(i);
+      Integer in= inputNums.get(i);
 
-      g.inputTypes[in.intValue()]=inputTypes[i];
+      g.inputTypes[in]=inputTypes[i];
     }
 
     if (gates==null) {  // nach dem Laden neu initialisieren
@@ -71,20 +71,20 @@ public abstract class ModularGate extends Gate{
    * statt aus dem out Array
    */
   public boolean getOutput(int n) {
-    Gate g=(Gate)outputGates.get(n);
-    Integer on=(Integer)outputNums.get(n);
+    Gate g= outputGates.get(n);
+    Integer on= outputNums.get(n);
     if (g!=null)
-      return g.getOutput(on.intValue());
+      return g.getOutput(on);
     else
       return false;
   }
 
   public void setInput(int n, Wire w) {
 
-    Gate g=(Gate)inputGates.get(n);
+    Gate g= inputGates.get(n);
     if (g==null) return;
-    Integer in=(Integer)inputNums.get(n);
-    g.setInput(in.intValue(), w);
+    Integer in= inputNums.get(n);
+    g.setInput(in, w);
 
     // Eingang n dieses Moduls auf neues Wire w setzen
     super.setInput(n,w);
@@ -93,7 +93,7 @@ public abstract class ModularGate extends Gate{
   public void reset() {
 
       for (int i=0; i<gates.size(); i++) {
-          Gate g=(Gate)gates.get(i);
+          Gate g= gates.get(i);
           if (g!=null) g.reset();
       }
   }

@@ -53,6 +53,7 @@ public class App {
     
     /**Main method*/
     public static void main(String[] args) {
+        //noinspection ConstantIfStatement
         if (true) throw new UnsupportedOperationException("Don't start here. Start from LogicSimModLoader"); //LSML: Use LogicSimModLoader
         try {
             //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -68,7 +69,7 @@ public class App {
         String fname=f.getAbsolutePath() + "/modules/";
         f=new File(fname);
         if (f!=null && f.exists() && f.isDirectory()) {
-            return new String(f.getAbsolutePath() + "/");
+            return f.getAbsolutePath() + "/";
         } else {
             JOptionPane.showMessageDialog(null, "Directory modules not found.\nPlease run the program from its directory");
             System.exit(0);

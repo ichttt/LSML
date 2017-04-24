@@ -67,10 +67,10 @@ public class CLK extends Gate {
   public boolean showProperties(Component frame) {
     String h = (String)JOptionPane.showInputDialog(frame, I18N.getString("MESSAGE_ENTER_TIME_HIGH"), "LogicSim",
                                                    JOptionPane.QUESTION_MESSAGE, null,null, Integer.toString((int)highTime));
-    if (h!=null && h.length()>0) highTime=new Integer(h).intValue();
+    if (h!=null && h.length()>0) highTime= new Integer(h);
     h = (String)JOptionPane.showInputDialog(frame, I18N.getString("MESSAGE_ENTER_TIME_LOW"), "LogicSim",
                                             JOptionPane.QUESTION_MESSAGE, null,null, Integer.toString((int)lowTime));
-    if (h!=null && h.length()>0) lowTime=new Integer(h).intValue();
+    if (h!=null && h.length()>0) lowTime= new Integer(h);
     return true;
   }
 

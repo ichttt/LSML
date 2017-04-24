@@ -31,7 +31,7 @@ public class Simulate implements Runnable {
       /* Reset */
       if (doReset) {
           for (int i=0; i<lspanel.gates.size(); i++) {
-              Gate g = (Gate)lspanel.gates.get(i);
+              Gate g = lspanel.gates.get(i);
               g.reset();
           }
           doReset=false;

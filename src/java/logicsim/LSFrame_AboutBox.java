@@ -29,14 +29,14 @@ public class LSFrame_AboutBox extends JWindow {
     getContentPane().add(splashPanel,"Center");
     this.enableEvents(AWTEvent.MOUSE_EVENT_MASK);
 
-    this.show();
+    this.setVisible(true);
   }
 
   protected void processMouseEvent(MouseEvent e) {
     super.processMouseEvent(e);
     int id = e.getID();
     if (id==MouseEvent.MOUSE_CLICKED) {
-      this.hide();
+      this.setVisible(false);
       this.dispose();
     }
   }

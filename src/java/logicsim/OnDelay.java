@@ -57,7 +57,7 @@ public class OnDelay extends Gate {
   public boolean showProperties(Component frame) {
     String h = (String)JOptionPane.showInputDialog(frame, I18N.getString("GATE_TURNONDELAY_TIME"), I18N.getString("GATE_TURNONDELAY"),
                                                     JOptionPane.QUESTION_MESSAGE, null,null, Integer.toString((int)delayTime));
-    if (h!=null && h.length()>0) delayTime=new Integer(h).intValue();
+    if (h!=null && h.length()>0) delayTime= new Integer(h);
     return true;
   }
 

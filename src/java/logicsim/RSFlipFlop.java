@@ -41,18 +41,18 @@ public class RSFlipFlop extends ModularGate{
 
     // Eingang 0 dieses Moduls auf Eingang 0 des Gatters not1 setzen
     inputGates.setElementAt(not1, 0);
-    inputNums.setElementAt(new Integer(0), 0);
+    inputNums.setElementAt(0, 0);
     // Eingang 1 dieses Moduls auf Eingang 0 des Gatters not2 setzen
     inputGates.setElementAt(not2, 1);
-    inputNums.setElementAt(new Integer(0), 1);
+    inputNums.setElementAt(0, 1);
 
 
     // Ausgang 0 dieses Moduls auf Ausgang 0 des Gatters n1 setzen
     outputGates.setElementAt(n1, 0);
-    outputNums.setElementAt(new Integer(0), 0);
+    outputNums.setElementAt(0, 0);
     // Ausgang 1 dieses Moduls auf Ausgang 0 des Gatters n2 setzen
     outputGates.setElementAt(n2, 1);
-    outputNums.setElementAt(new Integer(0), 1);
+    outputNums.setElementAt(0, 1);
   }
 
   public int getNumInput() {

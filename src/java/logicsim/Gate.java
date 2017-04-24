@@ -139,7 +139,7 @@ public abstract class Gate implements Serializable {
     
     
       
-    Wire w=(Wire)in.get(n);
+    Wire w= in.get(n);
     if (w==null && inputTypes[n]!=INTYPE_NORMAL) return new Wire(null,0);
     return w;
   }
@@ -212,7 +212,7 @@ public abstract class Gate implements Serializable {
 
 
     for (int j=0; j<getNumInput(); j++) {
-      Wire w=(Wire)in.get(j);
+      Wire w= in.get(j);
       if (w!=null) w.draw(g);
     }
   }
