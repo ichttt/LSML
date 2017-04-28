@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -119,7 +120,9 @@ public class Loader {
             }
         }
 
-        for (File modFile : modFiles) {
+        Iterator<File> modIterator = modFiles.iterator();
+        while (modIterator.hasNext()){
+            File modFile = modIterator.next();
             LSMLLog.fine("Processing file %s", modFile);
             try {
                 String pathToInstance;
@@ -127,11 +130,13 @@ public class Loader {
                     pathToInstance = ModDataReader.parseModInfo(modFile, modFile.toString().substring(0, modFile.toString().length() - 4));
                 } catch (FileNotFoundException e) {
                     LSMLLog.info("No ModInfo for file %s found - ignoring", modFile);
+                    modIterator.remove();
                     continue;
                 }
 
                 if (!addURL(modFile)) { //Add to classpath
                     LSMLLog.error("Skipping mod %s as it failed to inject into classpath!", modFile);
+                    modIterator.remove();
                     continue;
                 }
 
@@ -139,6 +144,7 @@ public class Loader {
                 Mod currentMod = LSMLUtil.getModAnnotationForClass(modClass);
                 if (currentMod == null) {
                     LSMLLog.warning("Could not find Mod annotation for %s, skipping!", modFile);
+                    modIterator.remove();
                     continue;
                 }
                 LSMLLog.fine("Found Mod annotation");

@@ -63,8 +63,8 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
                 throw new IOException("Could not find File!");
             String newFileName = "/LSMLv" + newVersion + ".jar";
             Files.copy(supposedLSMLFile.toPath(), new File(loader.basePath.toString() + newFileName).toPath());
-            JOptionPane.showMessageDialog(null, "LSML has been updated. Please start " + newFileName + " to launch the new version");
-        } finally {
+            JOptionPane.showMessageDialog(null, String.format(LogicSimModLoader.translate("LSMLUpdateHint"), newFileName.substring(1)));
+        } finally { //Cleanup the created files
             if (!file.delete())
                 LSMLLog.fine("Could not clean up " + file.getName());
             Path directory = Paths.get(loader.tempPath + "/LSMLUPDATE");

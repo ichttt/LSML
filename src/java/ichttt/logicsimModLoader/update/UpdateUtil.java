@@ -10,6 +10,7 @@ import ichttt.logicsimModLoader.util.NetworkHelper;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -25,9 +26,11 @@ public class UpdateUtil {
     public static boolean updateMod(UpdateContext ctx, VersionBase newVersion) {
         ModContainer container = ctx.linkedModContainer;
         if (ctx.noDownloading()) {
+            LSMLLog.fine("Firing onUpdateDownloadPost early - Mod takes care about updating");
             try {
                 ctx.getUpdateListener().onUpdateDownloadPost(newVersion);
             } catch (Exception e) {
+                LSMLLog.fine("The mod failed updating!");
                 return false;
             }
             ctx.setDownloaded();
@@ -59,9 +62,9 @@ public class UpdateUtil {
         } catch (Exception e) {
             LSMLLog.log("Could not update mod " + container.mod.modid(), Level.INFO, e);
             if (!outputJar.delete())
-                LSMLLog.fine("Could not cleanup jar file!");
+                LSMLLog.warning("Could not cleanup jar file!");
             if (!outputModinfo.delete())
-                LSMLLog.fine("Could not cleanup modinfo file!");
+                LSMLLog.warning("Could not cleanup modinfo file!");
             return false;
         }
         ctx.setDownloaded();
@@ -86,7 +89,7 @@ public class UpdateUtil {
             }
         }
         else {
-            LSMLLog.warning("Could not open link - java.awt.Desktop is not supported!");
+            LSMLLog.warning("Could not open link - java.awt.Desktop is not supported!"); //What JVM is this?
         }
     }
 }

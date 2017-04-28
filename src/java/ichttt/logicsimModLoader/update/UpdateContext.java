@@ -3,7 +3,10 @@ package ichttt.logicsimModLoader.update;
 import com.google.common.base.Preconditions;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.IUpdateListener;
+import ichttt.logicsimModLoader.api.Mod;
+import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
+import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -78,6 +81,11 @@ public class UpdateContext implements Comparable<UpdateContext> {
      * @param takeCareAboutDownloadYourself True to ensure that you take care about the button press yourself
      */
     public UpdateContext enableAutoUpdate(boolean takeCareAboutDownloadYourself) {
+        Mod activeMod = LSMLUtil.getActiveModFromCurrentThread();
+        if (activeMod == null)
+            LSMLLog.warning("Unknown mod registered auto update with manuel download.");
+        else if (!activeMod.modid().equals("LSML"))
+            LSMLLog.fine("Mod %s (modid%s) registered auto update with manuel download. This is not recommended", activeMod.modName(), activeMod.modid());
         checkNull(this.pathToRemoteJar, "Path to remote JAR is already set!");
         this.noDownload = takeCareAboutDownloadYourself;
         return this;

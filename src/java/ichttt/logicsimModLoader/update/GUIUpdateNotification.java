@@ -80,9 +80,9 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         lLayout.gridy = 1;
         lLayout.anchor = GridBagConstraints.PAGE_START;
         lLayout.fill = GridBagConstraints.BOTH;
-        updateAll = new JButton("Update all possible mods");
-        updateAll.setToolTipText("Updates all mods that opted in to automatic update.\nNot all mod may be updated this way.");
-        updateAll.addActionListener(event -> updateAll());
+        updateAll = new JButton(LogicSimModLoader.translate("updateAll"));
+        updateAll.setToolTipText(LogicSimModLoader.translate("updateAllTooltip"));
+        updateAll.addActionListener(event -> constructAndRunUpdateThread(new UpdateThreadMultiObjects(updateMap, this)));
         updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
         leftPanel.add(updateAll, lLayout);
 
@@ -92,7 +92,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         rLayout.gridy = 1;
         rLayout.anchor = GridBagConstraints.CENTER;
         rLayout.fill = GridBagConstraints.BOTH;
-        updateMod = new JButton("Update mod");
+        updateMod = new JButton(LogicSimModLoader.translate("updateMod"));
         updateMod.setActionCommand("update");
         updateMod.addActionListener(this);
         rightOuterPanel.add(updateMod, rLayout);
@@ -101,7 +101,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         rLayout.gridy = 1;
         rLayout.weighty = 0.03;
         rLayout.weightx = 0.5;
-        visitURL = new JButton("Visit Website");
+        visitURL = new JButton(LogicSimModLoader.translate("visitWebsite"));
         visitURL.setActionCommand("visit");
         visitURL.addActionListener(this);
         rightOuterPanel.add(visitURL, rLayout);
@@ -145,7 +145,7 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         centerComponent(dialog);
 
         updateDiag = new JDialog(parent);
-        updateDiag.setTitle("Updating, please wait");
+        updateDiag.setTitle(LogicSimModLoader.translate("waitUpdating"));
         updateDiag.setMinimumSize(new Dimension((int) Math.round(dialog.getPreferredSize().width *0.25), (int) Math.round(dialog.getPreferredSize().height *0.2)));
         JProgressBar bar = new JProgressBar();
         bar.setIndeterminate(true);
@@ -156,14 +156,14 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         centerComponent(updateDiag);
 
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
-
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 updateDiag.dispose();
             }
         });
+
+        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
 
     }
 
@@ -194,11 +194,11 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     }
 
     private static String buildText(Mod mod, VersionBase newVersion, @Nullable String changelog, @Nullable URL website) {
-        String s = String.format("Mod %s (modid %s) has an Update available!\nOld Version was <b>%s</b>, new Version is <b>%s</b>", mod.modName(), mod.modid(), mod.version(), newVersion);
+        String s = String.format(LogicSimModLoader.translate("updateString"), mod.modName(), mod.modid(), mod.version(), newVersion);
         if (website != null)
             s += "\nWebsite: " + "<a href=\"" + website + "\">" + website + "</a>";
         if (!Strings.isNullOrEmpty(changelog))
-            s += "\n\n\nChangelog:\n" + changelog;
+            s += "\n\n\n" + LogicSimModLoader.translate("changelog") + ":\n" + changelog;
         return s;
     }
 
@@ -212,11 +212,6 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         Thread thread = new Thread(runnable);
         thread.setName("Update thread");
         thread.start();
-    }
-
-    private void updateAll() {
-        UpdateThreadMultiObjects threadMultiObjects = new UpdateThreadMultiObjects(updateMap, this);
-        constructAndRunUpdateThread(threadMultiObjects);
     }
 
     @Override
@@ -250,12 +245,13 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
     public void callbackSingleUpdateState(UpdateContext ctx, boolean success) {
         callbackBaseTasks(ctx);
-        String text = success ? "Update successful! It will be applied at the next startup!" : "Could not update mod. You have to try manuel";
-        SwingUtilities.invokeLater(() ->JOptionPane.showMessageDialog(dialog, text));
+        Mod mod = ctx.linkedModContainer.mod;
+        String text = success ? LogicSimModLoader.translate("updateSuccess") : LogicSimModLoader.translate("updateFail");
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(dialog, String.format(text, mod.modName(), mod.modid())));
     }
 
     public void callbackMultiUpdateState(String notification) {
         callbackBaseTasks(activeUpdateContext);
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, notification));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(dialog, notification));
     }
 }

@@ -2,6 +2,7 @@ package ichttt.logicsimModLoader.update.threads;
 
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.Mod;
+import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.update.GUIUpdateNotification;
 import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.update.UpdateUtil;
@@ -35,11 +36,11 @@ public class UpdateThreadMultiObjects implements Runnable {
         }
         String s;
         if (failedUpdates.isEmpty()) {
-            s= "Update successful! It will be applied at the next startup!";
+            s = LogicSimModLoader.translate("updateSuccess");
         } else {
             StringBuilder failedMods = new StringBuilder();
-            failedUpdates.forEach(mod -> failedMods.append(String.format("\nCould not update mod %s (modid %s)", mod.modName(), mod.modid())));
-            s = "The following mods failed to update:" + failedMods.toString() + "\nYou have to update these manuel\nThe other mods will be updated during restart";
+            failedUpdates.forEach(mod -> failedMods.append(String.format("\n" + LogicSimModLoader.translate("updateFail"), mod.modName(), mod.modid())));
+            s = String.format(LogicSimModLoader.translate("updateFailedMods"), failedMods.toString());
         }
         notification.callbackMultiUpdateState(s);
     }
