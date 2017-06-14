@@ -16,7 +16,7 @@ public class App {
     
     /**Construct the application*/
     public App() {
-        new I18N();
+//        new I18N(); LSML: We already did this
         frame = new MyFrame(); //LSML: reroute to field
         lsframe = new LSFrame(frame);
         ((BasicInternalFrameUI) lsframe.getUI()).setNorthPane(null);
@@ -31,7 +31,6 @@ public class App {
         
         lsframe.validate();
         frame.validate();
-        LSMLHooks.doInit(); //LSML: Fire Init before setting visible
 
         //Center the window
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -47,6 +46,7 @@ public class App {
         lsframe.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         frame.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         lsframe.setVisible(true);
+        LSMLHooks.doInit(); //LSML: Fire Init before setting visible
 //        frame.setVisible(true); LSML: NOPE, called later
         
     }

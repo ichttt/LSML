@@ -15,7 +15,7 @@ public class ProgressBarManager {
     private static JFrame frame;
 
     static void init() {
-        bar = new JProgressBar(1, 6);
+        bar = new JProgressBar(1, 7);
         JPanel panel = new JPanel(new GridLayout(0, 1));
         frame = new JFrame("Loading LogicSim mods...");
         bar.setValue(1);
@@ -46,8 +46,14 @@ public class ProgressBarManager {
         bar.setValue(bar.getValue() + 1);
     }
 
+    /**
+     * Deletes the references to the GUI for the ProgressBar
+     */
     static void destroyWindow() {
         if (frame != null)
             frame.dispose();
+        frame = null;
+        bar = null;
+        label = null;
     }
 }

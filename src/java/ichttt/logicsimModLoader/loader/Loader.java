@@ -44,7 +44,7 @@ public class Loader {
     public final Path basePath;
     @Nonnull
     public final File configPath, libPath, modPath, tempPath;
-    private final List<ModContainer> mods = new ArrayList<ModContainer>();
+    private final ArrayList<ModContainer> mods = new ArrayList<ModContainer>();
 
     private Loader() {
         basePath = Paths.get(".").toAbsolutePath().normalize();
@@ -171,6 +171,7 @@ public class Loader {
                 throw new RuntimeException("Error loading mod file " + modFile, e);
             }
         }
+        mods.trimToSize();
         LSMLLog.info("Successfully injected %s mods.", modFiles.size());
     }
 
