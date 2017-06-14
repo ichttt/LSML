@@ -60,13 +60,14 @@ public class LSFrame_AboutBox extends JWindow {
       g2.setFont(f);
 
       //g2.drawString("Version 2.0 2001/06/06", 10, 240);
-      String version=App.class.getPackage().getImplementationVersion();
+      String version = "2.4/LSML"; //LSML: hardcode this, indicate modded version
       g2.drawString("Version "+version, 10, 240);
       //g2.drawString("Version 2.3.3 2007-08-02", 10, 240);
       g2.drawString("Copyright (c) 1995-2009 by Andreas Tetzl", 10, 260);
       g2.drawString("andreas@tetzl.de         www.tetzl.de", 10, 280);
       g2.drawString("This program is free software", 250, 240);
       g2.drawString("Released under the GPL", 250, 280);
+      g2.drawString("Please note: This is a modified version of LogicSim!", 10, 300); //Everybody should know, just to be sure
       //g2.drawString("Please send me an eMail.", 250, 280);
 
       //g2.drawString("Artwork by Jens Borsdorf, www.jens-borsdorf.de", 10, 310);
