@@ -3,6 +3,7 @@ package ichttt.logicsimModLoader.update;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.exceptions.InvalidVersionStringException;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
@@ -89,7 +90,7 @@ public class UpdateChecker implements Runnable {
                 VersionBase modUpdateVersion = new VersionBase(version.trim());
                 if (modUpdateVersion.compareTo(yourMod.VERSION) > 0) {
                     LSMLLog.info("Found update for mod %s: Installed version is %s, while current version is %s", yourMod.mod.modName(), yourMod.VERSION.getVersionString(), modUpdateVersion.getVersionString());
-                    context.getUpdateListener().onUpdateAvailable();
+                    IUpdateListener.UpdateListenerWrapper.onUpdateAvailable(context.getUpdateListener());
                     modWithFoundUpdate.put(context, modUpdateVersion);
                 } else
                     LSMLLog.fine("No update found for mod %s: Installed version is %s, while current version is %s", yourMod.mod.modName(), yourMod.VERSION.getVersionString(), modUpdateVersion.getVersionString());
@@ -101,7 +102,12 @@ public class UpdateChecker implements Runnable {
                 LSMLUtil.closeSilent(bf);
             }
         }
-        SwingUtilities.invokeLater(UpdateChecker::printUpdateNotification);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                printUpdateNotification();
+            }
+        });
     }
 
     /**

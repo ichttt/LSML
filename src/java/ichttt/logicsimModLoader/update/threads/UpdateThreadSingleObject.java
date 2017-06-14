@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update.threads;
 
 import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.update.GUIUpdateNotification;
 import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.update.UpdateUtil;
@@ -21,7 +22,7 @@ public class UpdateThreadSingleObject implements Runnable {
 
     @Override
     public void run() {
-        ctx.getUpdateListener().onUpdateDownloadPre(false);
+        IUpdateListener.UpdateListenerWrapper.onUpdateDownloadPre(ctx.getUpdateListener(), false);
         notification.callbackSingleUpdateState(ctx, UpdateUtil.updateMod(ctx, newVersion));
     }
 }

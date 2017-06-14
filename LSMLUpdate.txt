@@ -1,4 +1,4 @@
 #Modid is LSML, as this is for the LSMLInternalMod
 LSML
 #Current version
-0.2.3
+0.3.0

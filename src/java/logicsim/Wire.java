@@ -27,7 +27,7 @@ public class Wire implements Serializable, Cloneable{
   public Wire(Gate g, int n) {
     gate=g;
     poly=new Polygon();
-    nodes=new Vector<>();
+    nodes=new Vector<Boolean>();
     outNum=n;
     active=true;
   }
@@ -198,7 +198,10 @@ public class Wire implements Serializable, Cloneable{
     try {
       clone=(Wire)super.clone();
     } catch (CloneNotSupportedException e) {
-      throw new InternalError(e);
+      Error toThrow = new InternalError();
+      //noinspection UnnecessaryInitCause
+      toThrow.initCause(e);
+      throw toThrow;
     }
     // Kopie von poly & nodes anlegen, Gate bleibt die selbe Referenz wie beim Original
     clone.poly=new Polygon(poly.xpoints, poly.ypoints, poly.npoints);

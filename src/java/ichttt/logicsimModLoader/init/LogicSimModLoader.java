@@ -28,7 +28,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.2.3";
+    public static final String LSML_VERSION_STRING = "0.3.0"; //Don't forget to bump update info, too
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;
@@ -81,11 +81,13 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
             LSMLLog.info("ProgressBar is disabled");
         coreInit();
         Loader loader = Loader.getInstance(); //init loader to load libs
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            File tempDir = Loader.getInstance().tempPath;
-            if (tempDir.isDirectory() && tempDir.listFiles().length == 0)
-                if (!tempDir.delete())
-                    LSMLLog.fine("Could not clean up temp dir");
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File tempDir = Loader.getInstance().tempPath;
+                if (tempDir.isDirectory() && tempDir.listFiles().length == 0)
+                    if (!tempDir.delete()) LSMLLog.fine("Could not clean up temp dir");
+            }
         }));
         registerSubscriptions();
         i18n = new I18nHelper("lsml");

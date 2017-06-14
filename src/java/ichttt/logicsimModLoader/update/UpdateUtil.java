@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update;
 
 import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
@@ -28,7 +29,7 @@ public class UpdateUtil {
         if (ctx.noDownloading()) {
             LSMLLog.fine("Firing onUpdateDownloadPost early - Mod takes care about updating");
             try {
-                ctx.getUpdateListener().onUpdateDownloadPost(newVersion);
+                IUpdateListener.UpdateListenerWrapper.onUpdateDownloadPost(ctx.getUpdateListener(), newVersion);
             } catch (Exception e) {
                 LSMLLog.fine("The mod failed updating!");
                 return false;
@@ -69,7 +70,7 @@ public class UpdateUtil {
         }
         ctx.setDownloaded();
         try {
-            ctx.getUpdateListener().onUpdateDownloadPost(newVersion);
+            IUpdateListener.UpdateListenerWrapper.onUpdateDownloadPost(ctx.getUpdateListener(), newVersion);
         } catch (IOException e) {
             LSMLLog.fine("onUpdateDownloadPost failed, but everything is downloaded - Continue as normal!");
         }

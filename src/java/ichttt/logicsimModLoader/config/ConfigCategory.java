@@ -67,10 +67,11 @@ public class ConfigCategory extends ConfigElement {
      */
     @Nullable
     public ConfigEntryBase getConfigEntry(String key) {
-        return configEntrys.stream().
-                filter(configEntry -> configEntry.key.equals(key)).
-                findFirst().
-                orElse(null);
+        for (ConfigEntryBase<?> entryBase : configEntrys) {
+            if (entryBase.key.equals(key))
+                return entryBase;
+        }
+        return null;
     }
 
     @Nonnull

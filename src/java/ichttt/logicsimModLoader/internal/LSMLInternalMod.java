@@ -48,6 +48,12 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
     private static JCheckBox warnOnSaveBox, checkForUpdatesBox;
     private static UpdateContext context;
 
+    //Cause j7 does not not have default interfaces
+    @Override
+    public void onUpdateAvailable() {}
+    @Override
+    public void onUpdateDownloadPre(boolean forAllMods) {}
+
     @Override
     public void onUpdateDownloadPost(VersionBase newVersion) throws IOException {
         //We have to retrieve our URL dynamically

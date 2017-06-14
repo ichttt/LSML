@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
@@ -24,10 +25,13 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -47,11 +51,20 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
     private UpdateContext activeUpdateContext;
 
-    public GUIUpdateNotification(Map<UpdateContext, VersionBase> updateMap) {
+    public GUIUpdateNotification(final Map<UpdateContext, VersionBase> updateMap) {
         this.updateMap = new LinkedHashMap<>(updateMap.size());
-        updateMap.entrySet().stream().
-                sorted(Map.Entry.comparingByKey()).
-                forEach(entry -> this.updateMap.put(entry.getKey(), entry.getValue()));
+
+        //Sorting in J7 sucks
+        List<Map.Entry<UpdateContext, VersionBase>> entries = new ArrayList<>(updateMap.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<UpdateContext, VersionBase>>() {
+            public int compare(Map.Entry<UpdateContext, VersionBase> o1, Map.Entry<UpdateContext, VersionBase> o2){
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+        for (Map.Entry<UpdateContext, VersionBase> entry : entries) {
+            this.updateMap.put(entry.getKey(), entry.getValue());
+        }
+
         JPanel leftPanel = new JPanel(new GridBagLayout());
         JScrollPane leftScrollPanel = new JScrollPane(leftPanel);
         leftScrollPanel.setMinimumSize(new Dimension(128, 72));
@@ -65,11 +78,11 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
         JList<String> list = new JList<>(listModel);
-        this.updateMap.keySet().forEach(context -> {
-            String modid = context.linkedModContainer.mod.modName();
+        for (Map.Entry<UpdateContext, VersionBase> entry : this.updateMap.entrySet()) {
+            String modid = entry.getKey().linkedModContainer.mod.modName();
             listModel.addElement(modid);
-            updateList.add(context);
-        });
+            updateList.add(entry.getKey());
+        }
         listModel.trimToSize();
 
         GridBagConstraints lLayout = new GridBagConstraints();
@@ -82,8 +95,13 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         lLayout.fill = GridBagConstraints.BOTH;
         updateAll = new JButton(LogicSimModLoader.translate("updateAll"));
         updateAll.setToolTipText(LogicSimModLoader.translate("updateAllTooltip"));
-        updateAll.addActionListener(event -> constructAndRunUpdateThread(new UpdateThreadMultiObjects(updateMap, this)));
-        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
+        updateAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                constructAndRunUpdateThread(new UpdateThreadMultiObjects(GUIUpdateNotification.this.updateMap, GUIUpdateNotification.this));
+            }
+        });
+        updateAll.setEnabled(anyDownloadAvailable());
         leftPanel.add(updateAll, lLayout);
 
         rLayout.weighty = 0.03;
@@ -163,8 +181,12 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
             }
         });
 
-        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
-
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dialog.setVisible(true);
+            }
+        });
     }
 
     private void updateRightComponent(UpdateContext context) {
@@ -190,7 +212,12 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         visitURL.setEnabled(website != null);
         updateMod.setEnabled(context.downloadAvailable());
 
-        SwingUtilities.invokeLater(() -> rightScrollPanel.getVerticalScrollBar().setValue(0));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                rightScrollPanel.getVerticalScrollBar().setValue(0);
+            }
+        });
     }
 
     private static String buildText(Mod mod, VersionBase newVersion, @Nullable String changelog, @Nullable URL website) {
@@ -207,8 +234,22 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
         comp.setLocation((screenSize.width - comp.getWidth())/ 2 , (screenSize.height - comp.getHeight())/2);
     }
 
+    private boolean anyDownloadAvailable() {
+        for (UpdateContext ctx : this.updateMap.keySet()) {
+            if (ctx.downloadAvailable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void constructAndRunUpdateThread(Runnable runnable) {
-        SwingUtilities.invokeLater(() -> updateDiag.setVisible(true));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateDiag.setVisible(true);
+            }
+        });
         Thread thread = new Thread(runnable);
         thread.setName("Update thread");
         thread.start();
@@ -238,20 +279,35 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
     }
 
     private void callbackBaseTasks(UpdateContext ctx) {
-        SwingUtilities.invokeLater(() -> updateDiag.setVisible(false));
-        updateAll.setEnabled(this.updateMap.keySet().stream().anyMatch(UpdateContext::downloadAvailable));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateDiag.setVisible(false);
+            }
+        });
+        updateAll.setEnabled(anyDownloadAvailable());
         updateRightComponent(ctx);
     }
 
     public void callbackSingleUpdateState(UpdateContext ctx, boolean success) {
         callbackBaseTasks(ctx);
-        Mod mod = ctx.linkedModContainer.mod;
-        String text = success ? LogicSimModLoader.translate("updateSuccess") : LogicSimModLoader.translate("updateFail");
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(dialog, String.format(text, mod.modName(), mod.modid())));
+        final Mod mod = ctx.linkedModContainer.mod;
+        final String text = success ? LogicSimModLoader.translate("updateSuccess") : LogicSimModLoader.translate("updateFail");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(dialog, String.format(text, mod.modName(), mod.modid()));
+            }
+        });
     }
 
-    public void callbackMultiUpdateState(String notification) {
+    public void callbackMultiUpdateState(final String notification) {
         callbackBaseTasks(activeUpdateContext);
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(dialog, notification));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(dialog, notification);
+            }
+        });
     }
 }

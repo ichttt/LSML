@@ -18,7 +18,7 @@ import java.util.List;
 public class ModListGui implements ListSelectionListener {
     private JSplitPane configPanel;
     private JDialog dialog;
-    private static final List<String> modnames = new ArrayList<>();
+    private static final List<String> modNames = new ArrayList<>();
     private static final List<IModGuiInterface> modGuiInterfaces = new ArrayList<>();
 
     private static ModListGui INSTANCE = null;
@@ -35,8 +35,12 @@ public class ModListGui implements ListSelectionListener {
         dialog.setTitle(LogicSimModLoader.translate("modSettings"));
         JList<String> containerJList = new JList<>();
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        modnames.forEach(listModel::addElement);
-        modGuiInterfaces.forEach(IModGuiInterface::setup);
+        for (String modName : modNames) {
+            listModel.addElement(modName);
+        }
+        for (IModGuiInterface guiInterface : modGuiInterfaces) {
+            guiInterface.setup();
+        }
         containerJList.setModel(listModel);
         containerJList.setSelectedIndex(0);
         containerJList.addListSelectionListener(this);
@@ -69,7 +73,7 @@ public class ModListGui implements ListSelectionListener {
      * @since 0.0.1
      */
     public static void registerModGui(Mod mod, IModGuiInterface guiInterface) {
-        modnames.add(mod.modName());
+        modNames.add(mod.modName());
         modGuiInterfaces.add(guiInterface);
     }
 }

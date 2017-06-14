@@ -32,7 +32,9 @@ public class SimpleStorage implements ISaveHandler {
     public List<String> saveLines() {
         List<String> list = new ArrayList<>();
         list.add(SIMPLE_FORMAT_IDENTIFIER);
-        keyValueMap.forEach((key, value) -> list.add(KEY_IDENTIFIER + key + VALUE_IDENTIFIER + value));
+        for (Map.Entry entry : keyValueMap.entrySet()) {
+            list.add(KEY_IDENTIFIER + entry.getKey() + VALUE_IDENTIFIER + entry.getValue());
+        }
         return list;
     }
 

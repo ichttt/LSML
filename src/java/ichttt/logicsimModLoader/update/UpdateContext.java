@@ -10,6 +10,7 @@ import ichttt.logicsimModLoader.util.LSMLUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -149,5 +150,17 @@ public class UpdateContext implements Comparable<UpdateContext> {
         return this.linkedModContainer.mod.modName().compareToIgnoreCase(o.linkedModContainer.mod.modName());
     }
 
-    private static final IUpdateListener DUMMY_INSTANCE = new IUpdateListener(){};
+    private static final IUpdateListener DUMMY_INSTANCE = new IUpdateListener(){
+        @Override
+        public void onUpdateAvailable() {
+        }
+
+        @Override
+        public void onUpdateDownloadPre(boolean forAllMods) {
+        }
+
+        @Override
+        public void onUpdateDownloadPost(VersionBase newVersion) throws IOException {
+        }
+    };
 }

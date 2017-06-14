@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -62,7 +63,9 @@ public class Loader {
             LSMLLog.error("Could not load libs - libPath.listFiles returned null!");
             throw new RuntimeException("Could not load libs - libPath.listFiles returned null!");
         }
-        Arrays.stream(libs).forEach(Loader::addURL); //Add the libs to classpath
+        for (File lib : libs) {
+            addURL(lib); //Add the libs to classpath
+        }
     }
 
     /**
@@ -82,15 +85,15 @@ public class Loader {
      */
     @Nullable
     public ModContainer getModContainerForModID(String modid) {
-        return mods.stream().
-                filter(modContainer -> modContainer.mod.modid().equals(modid)).
-                findAny().
-                orElse(null);
+        for (ModContainer container : mods) {
+            if (container.mod.modid().equals(modid))
+                return container;
+        }
+        return null;
     }
 
     public boolean hasMod(String modid) {
-        return mods.stream().
-                anyMatch(modContainer -> modContainer.mod.modid().equals(modid));
+        return getModContainerForModID(modid) != null;
     }
 
     /**
@@ -108,7 +111,12 @@ public class Loader {
             LSMLLog.error("Could not load mods - modPath.listFiles returned null!");
             throw new RuntimeException("Could not load mods - modPath.listFiles returned null!");
         }
-        Arrays.sort(files, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
         List<File> modFiles = new ArrayList<>();
         for (File possibleMod : files) {
             if (!possibleMod.isFile() || !possibleMod.getName().endsWith(".jar")) {

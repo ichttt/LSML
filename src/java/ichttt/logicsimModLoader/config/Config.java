@@ -192,6 +192,14 @@ public class Config extends ConfigElement {
         registrationAllowed = false;
     }
 
+    private static boolean hasDuplicateParser(IConfigEntryParser toCheck) {
+        for (IConfigEntryParser entryParser : entryParsers) {
+            if (toCheck.getClass().equals(entryParser.getClass()))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Register your own custom {@link IConfigEntryParser}.
      * Only register one time per class
@@ -207,11 +215,8 @@ public class Config extends ConfigElement {
             else
                 LSMLLog.warning("A config parser is registered late!");
         }
-        boolean duplicateParser = entryParsers.stream().
-                anyMatch(entryParser -> parser.getClass().equals(entryParser.getClass()));
-        if (!entryParsers.contains(parser) &&  !duplicateParser) {
+        if (!entryParsers.contains(parser) && !hasDuplicateParser(parser))
             entryParsers.add(parser);
-        }
         else
             LSMLLog.warning("Tried registering the same ConfigEntryParsers (%s) twice!", parser.getClass().getName());
     }

@@ -40,11 +40,12 @@ public class SaveHandler {
         bf.newLine();
         bf.write(mods);
         bf.newLine();
-        saveHandlers.forEach((mod, handler) -> {
+        for (Map.Entry<String, ISaveHandler> handler : saveHandlers.entrySet()) {
+            String mod = handler.getKey();
             try {
                 bf.write(MOD_START + mod);
                 bf.newLine();
-                for (String line : handler.saveLines()) {
+                for (String line : handler.getValue().saveLines()) {
                     bf.write(line);
                     bf.newLine();
                 }
@@ -54,7 +55,7 @@ public class SaveHandler {
                 LSMLLog.error("A critical error occurred while saving mod data");
                 LSMLUtil.showMessageDialogOnWindowIfAvailable("Could not save mod specific data!", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        });
+        }
 
         LSMLUtil.closeSilent(bf);
     }
@@ -108,8 +109,13 @@ public class SaveHandler {
             String line1 = br.readLine();
             String line2 = br.readLine();
             String[] modsSaved = line2.split(SPLITTER);
-            return (line1.equals(REV_STRING) && Arrays.stream(modsSaved).
-                    allMatch(s -> saveHandlers.keySet().contains(s)));
+            if (!line1.equals(REV_STRING))
+                return false;
+            for (String mod : modsSaved) {
+                if (!saveHandlers.containsKey(mod))
+                    return false;
+            }
+            return true;
         } catch (IOException e) {
             LSMLLog.log("Error while reading file header!", Level.SEVERE, e);
             return false;
@@ -171,7 +177,9 @@ public class SaveHandler {
         registrationAllowed = false;
         if (!saveHandlers.isEmpty()) {
             StringBuilder writerList = new StringBuilder();
-            saveHandlers.keySet().forEach((String s) -> writerList.append(s).append(SPLITTER));
+            for (String s : saveHandlers.keySet()) {
+                writerList.append(s).append(SPLITTER);
+            }
             String s = writerList.toString();
             mods = s.substring(0, s.length() - 1);
         }

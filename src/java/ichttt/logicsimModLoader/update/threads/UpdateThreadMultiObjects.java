@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.update.threads;
 
 import ichttt.logicsimModLoader.VersionBase;
+import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.update.GUIUpdateNotification;
@@ -30,7 +31,7 @@ public class UpdateThreadMultiObjects implements Runnable {
             UpdateContext ctx = entry.getKey();
             if (ctx.isDownloaded())
                 continue;
-            ctx.getUpdateListener().onUpdateDownloadPre(true);
+            IUpdateListener.UpdateListenerWrapper.onUpdateDownloadPre(ctx.getUpdateListener(), true);
             if (!UpdateUtil.updateMod(ctx, entry.getValue()))
                 failedUpdates.add(ctx.linkedModContainer.mod);
         }
@@ -39,7 +40,9 @@ public class UpdateThreadMultiObjects implements Runnable {
             s = LogicSimModLoader.translate("updateSuccess");
         } else {
             StringBuilder failedMods = new StringBuilder();
-            failedUpdates.forEach(mod -> failedMods.append(String.format("\n" + LogicSimModLoader.translate("updateFail"), mod.modName(), mod.modid())));
+            for (Mod failed : failedUpdates) {
+                failedMods.append(String.format("\n" + LogicSimModLoader.translate("updateFail"), failed.modName(), failed.modid()));
+            }
             s = String.format(LogicSimModLoader.translate("updateFailedMods"), failedMods.toString());
         }
         notification.callbackMultiUpdateState(s);

@@ -5,7 +5,6 @@ import ichttt.logicsimModLoader.config.ConfigElement;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Extend this if you want to define custom config fields
@@ -42,9 +41,10 @@ public abstract class ConfigEntryBase<T> extends ConfigElement {
     @Nonnull
     @Override
     public List<String> generateLines() {
-        List<String> lines = comment.stream().
-                map(aComment -> "* " + aComment).
-                collect(Collectors.toList());
+        List<String> lines = new ArrayList<>(comment.size() + 1);
+        for (String line : comment) {
+            lines.add("* " + line);
+        }
         lines.add("* " + postComment);
         return lines;
     }
