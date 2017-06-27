@@ -28,7 +28,7 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.3.0"; //Don't forget to bump update info, too
+    public static final String LSML_VERSION_STRING = "0.3.1"; //Don't forget to bump update info, too AND SIGN IT
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
     private static boolean isDev = false;

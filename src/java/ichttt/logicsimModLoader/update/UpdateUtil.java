@@ -11,9 +11,11 @@ import ichttt.logicsimModLoader.util.NetworkHelper;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 /**
@@ -59,7 +61,24 @@ public class UpdateUtil {
         try {
             NetworkHelper.readFileFromURL(ctx.getPathToRemoteJar(), outputJar);
             NetworkHelper.readFileFromURL(ctx.getPathToRemoteModinfo(), outputModinfo);
-            ModDataReader.parseModInfo(outputJar, outputModinfo); //try parsing the modinfo for a first test. If this fails, we abort the update
+            String modClass = ModDataReader.parseModInfo(outputJar, outputModinfo); //try parsing the modinfo for a first test. If this fails, we abort the update
+            if (ctx.getCertificates() != null) {
+                JarFile file = new JarFile(outputJar); //now try validating the certificates
+                JarEntry entry = file.getJarEntry(modClass);
+                Certificate[] oldCertificates = ctx.getCertificates();
+                Certificate[] newCertificates = entry.getCertificates();
+                if (newCertificates.length != ctx.getCertificates().length)
+                    throw new RuntimeException("Got different certificate lengths. Original has " + oldCertificates.length + " while new has " + newCertificates.length + " certificates");
+                for (int i = 0; i< newCertificates.length; i++) {
+                    Certificate origCert = oldCertificates[i];
+                    Certificate newCert = newCertificates[i];
+                    if (!origCert.toString().equals(newCert.toString()))
+                        throw new RuntimeException("Got invalid cert: Original has " + origCert.toString() + " while new has " + newCert.toString());
+                    else
+                        LSMLLog.fine("Verified cert string " + newCert.toString());
+                }
+                LSMLLog.info("Verified jar signatures!");
+            }
         } catch (Exception e) {
             LSMLLog.log("Could not update mod " + container.mod.modid(), Level.INFO, e);
             if (!outputJar.delete())

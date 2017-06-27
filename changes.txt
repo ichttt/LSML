@@ -1,5 +1,12 @@
 LSML changelog
 
+0.3.1
+ADDED:
+Certificate validation - LSML will now verify jar certificates when updating and enabled by the mod
+
+CHANGED:
+LSML now uses certificate validation! Makes the updater more secure
+
 0.3.0
 ADDED:
 Java 7 support. Mods may still target J8.

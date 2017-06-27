@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.IUpdateListener;
 import ichttt.logicsimModLoader.api.Mod;
+import ichttt.logicsimModLoader.exceptions.ModException;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.util.LSMLUtil;
@@ -12,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
+import java.security.cert.Certificate;
 
 /**
  * An UpdateContext holds all the information required for the {@link UpdateChecker}
@@ -23,6 +25,7 @@ public class UpdateContext implements Comparable<UpdateContext> {
     private URL website, changelogURL, pathToRemoteJar, pathToRemoteModinfo;
     private boolean isFinished, isDownloaded, noDownload;
     private IUpdateListener updateListener = DUMMY_INSTANCE;
+    private Certificate[] certificates;
 
     /**
      * Creates the basic context for the new updateChecker
@@ -103,6 +106,22 @@ public class UpdateContext implements Comparable<UpdateContext> {
         return this;
     }
 
+    /**
+     * Enables verification of the downloaded file using the class certificate.
+     * This is only necessary for enable auto update
+     * <br><b>THIS REQUIRES YOUR JAR TO BE SIGNED AND WILL DISABLE UPDATING IF NO CERTIFICATE IS FOUND!</b>
+     * <br>If the downloaded jar does not match this fingerprint, the update will be rolled back.
+     * @since 0.3.1
+     */
+    @Nonnull
+    public UpdateContext enableCertificateValidation() throws ModException {
+        Certificate[] certificates = linkedModContainer.getClass().getProtectionDomain().getCodeSource().getCertificates();
+        if (certificates == null)
+            throw new ModException(linkedModContainer.mod, "Could not find certificates!");
+        this.certificates = certificates;
+        return this;
+    }
+
     @Nullable
     public URL getWebsite() {
         return website;
@@ -143,6 +162,10 @@ public class UpdateContext implements Comparable<UpdateContext> {
     @Nullable
     public URL getPathToRemoteModinfo() {
         return pathToRemoteModinfo;
+    }
+
+    public Certificate[] getCertificates() {
+        return certificates;
     }
 
     @Override

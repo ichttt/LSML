@@ -9,6 +9,7 @@ import ichttt.logicsimModLoader.config.ConfigCategory;
 import ichttt.logicsimModLoader.config.entry.BooleanConfigEntry;
 import ichttt.logicsimModLoader.event.loading.LSMLPreInitEvent;
 import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
+import ichttt.logicsimModLoader.exceptions.ModException;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.loader.Loader;
@@ -46,7 +47,6 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
     private static JPanel panel;
     private static BooleanConfigEntry warnOnSave, checkForUpdates;
     private static JCheckBox warnOnSaveBox, checkForUpdatesBox;
-    private static UpdateContext context;
 
     //Cause j7 does not not have default interfaces
     @Override
@@ -94,11 +94,15 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
         try {
-            context = new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
+            UpdateContext context = new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
                     withChangelogURL(new URL("https://raw.githubusercontent.com/ichttt/LSML/master/changes.txt")).
                     withWebsite(new URL("https://github.com/ichttt/LSML/releases/latest")).
-                    enableAutoUpdate(true).
                     registerUpdateListener(this);
+            try {
+                context.enableCertificateValidation().enableAutoUpdate(true);
+            } catch (ModException e) {
+                LSMLLog.warning("Could not enable certificate validation! Disabling auto-update for LSML as a security precaution.");
+            }
             event.checkForUpdate(context);
         } catch (IOException e) {
             LSMLLog.log("Error registering UpdateChecker.", Level.SEVERE, e);
