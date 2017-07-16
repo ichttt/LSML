@@ -3,6 +3,7 @@ package ichttt.logicsimModLoader.internal;
 import com.google.common.eventbus.Subscribe;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.IUpdateListener;
+import ichttt.logicsimModLoader.api.InjectContainer;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.config.Config;
 import ichttt.logicsimModLoader.config.ConfigCategory;
@@ -47,6 +48,8 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
     private static JPanel panel;
     private static BooleanConfigEntry warnOnSave, checkForUpdates;
     private static JCheckBox warnOnSaveBox, checkForUpdatesBox;
+    @InjectContainer
+    private static ModContainer container;
 
     //Cause j7 does not not have default interfaces
     @Override
@@ -94,7 +97,7 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
     public void register(LSMLRegistrationEvent event) {
         event.registerModGui(LSMLUtil.getModAnnotationForClass(LSMLInternalMod.class), this);
         try {
-            UpdateContext context = new UpdateContext(Loader.getInstance().getModContainerForModID(MODID), new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
+            UpdateContext context = new UpdateContext(container, new URL("https://raw.githubusercontent.com/ichttt/LSML/master/LSMLUpdate.txt")).
                     withChangelogURL(new URL("https://raw.githubusercontent.com/ichttt/LSML/master/changes.txt")).
                     withWebsite(new URL("https://github.com/ichttt/LSML/releases/latest")).
                     registerUpdateListener(this);
@@ -111,7 +114,7 @@ public class LSMLInternalMod implements ActionListener, IModGuiInterface, IUpdat
 
     @Subscribe
     public void onPreInit(LSMLPreInitEvent event) {
-        config = new Config(Loader.getInstance().getModContainerForModID(MODID));
+        config = new Config(container);
         ConfigCategory category = new ConfigCategory("General");
 
         warnOnSave = new BooleanConfigEntry("warnOnLoad", true, "Warn on load if mod-saved data could not be loaded");

@@ -6,6 +6,7 @@ import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.loader.ModDataReader;
+import ichttt.logicsimModLoader.util.LSMLUtil;
 import ichttt.logicsimModLoader.util.NetworkHelper;
 
 import java.awt.*;
@@ -33,7 +34,7 @@ public class UpdateUtil {
             try {
                 IUpdateListener.UpdateListenerWrapper.onUpdateDownloadPost(ctx.getUpdateListener(), newVersion);
             } catch (Exception e) {
-                LSMLLog.fine("The mod failed updating!");
+                LSMLLog.log("The mod failed updating!", Level.FINE, e);
                 return false;
             }
             ctx.setDownloaded();
@@ -58,13 +59,14 @@ public class UpdateUtil {
                 return false;
             }
         }
+        JarFile file = null;
         try {
             NetworkHelper.readFileFromURL(ctx.getPathToRemoteJar(), outputJar);
             NetworkHelper.readFileFromURL(ctx.getPathToRemoteModinfo(), outputModinfo);
             String modClass = ModDataReader.parseModInfo(outputJar, outputModinfo); //try parsing the modinfo for a first test. If this fails, we abort the update
             if (ctx.getCertificates() != null) {
-                JarFile file = new JarFile(outputJar); //now try validating the certificates
-                JarEntry entry = file.getJarEntry(modClass);
+                file = new JarFile(outputJar); //now try validating the certificates
+                JarEntry entry = file.getJarEntry(modClass.replaceAll("\\.", "/") + ".class");
                 Certificate[] oldCertificates = ctx.getCertificates();
                 Certificate[] newCertificates = entry.getCertificates();
                 if (newCertificates.length != ctx.getCertificates().length)
@@ -79,7 +81,9 @@ public class UpdateUtil {
                 }
                 LSMLLog.info("Verified jar signatures!");
             }
+            LSMLUtil.closeSilent(file);
         } catch (Exception e) {
+            LSMLUtil.closeSilent(file);
             LSMLLog.log("Could not update mod " + container.mod.modid(), Level.INFO, e);
             if (!outputJar.delete())
                 LSMLLog.warning("Could not cleanup jar file!");

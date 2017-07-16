@@ -1,6 +1,7 @@
 package ichttt.logicsimModLoader.util;
 
 import ichttt.logicsimModLoader.internal.LSMLLog;
+import ichttt.logicsimModLoader.loader.LSMLClassLoader;
 import logicsim.I18N;
 
 import javax.annotation.Nullable;
@@ -25,13 +26,13 @@ public class I18nHelper {
      */
     public I18nHelper(String baseName) {
         try {
-            FALLBACK = ResourceBundle.getBundle(baseName, Locale.ENGLISH);
+            FALLBACK = ResourceBundle.getBundle(baseName, Locale.ENGLISH, LSMLClassLoader.INSTANCE);
         } catch (MissingResourceException e) {
             LSMLLog.log(String.format("Error loading default resources for %s, strings may not be translated if selected.", baseName), Level.SEVERE, e);
             FALLBACK = null;
         }
         try {
-            DEFAULT = ResourceBundle.getBundle(baseName + "_" + I18N.getLanguageKey());
+            DEFAULT = ResourceBundle.getBundle(baseName, Locale.forLanguageTag(I18N.getLanguageKey()), LSMLClassLoader.INSTANCE);
         }  catch (MissingResourceException e) {
             LSMLLog.info("Falling back to english local for file " + baseName);
             DEFAULT = FALLBACK;

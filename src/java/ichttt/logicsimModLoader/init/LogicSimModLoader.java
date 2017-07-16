@@ -9,6 +9,7 @@ import ichttt.logicsimModLoader.event.loading.LSMLRegistrationEvent;
 import ichttt.logicsimModLoader.exceptions.MissingDependencyException;
 import ichttt.logicsimModLoader.internal.LSMLInternalMod;
 import ichttt.logicsimModLoader.internal.LSMLLog;
+import ichttt.logicsimModLoader.internal.ModContainerInjectionHandler;
 import ichttt.logicsimModLoader.internal.SaveHandler;
 import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.update.UpdateChecker;
@@ -28,10 +29,10 @@ import java.util.logging.Level;
  */
 public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler {
     private static App app;
-    public static final String LSML_VERSION_STRING = "0.3.1"; //Don't forget to bump update info, too AND SIGN IT
+    public static final String LSML_VERSION_STRING = "0.3.0"; //Don't forget to bump update info, too AND SIGN IT
     public static final VersionBase LSML_VERSION = new VersionBase(LSML_VERSION_STRING);
     private static boolean hasInit = false;
-    private static boolean isDev = false;
+    static boolean isDev = false;
     private static I18nHelper i18n;
 
     /**
@@ -39,17 +40,6 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
      */
     public static String translate(String s) {
         return i18n == null ? s : i18n.translate(s);
-    }
-
-    /**
-     * Run this from your dev environment to test your mod
-     * @since 0.0.1
-     */
-    public static void startFromDev() {
-        if (hasInit)
-            throw new RuntimeException("Only call this once!");
-        isDev = true;
-        main(null);
     }
 
     /**
@@ -62,9 +52,8 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
 
     /**
      * Starts off LSML and LogicSim itself
-     * Don't start from here if you are in a dev environment, start from {@link #startFromDev()}
      */
-    public static void main(@Nullable String[] args) {
+    public static void init(@Nullable String[] args) {
         if (hasInit)
             return;
         LogicSimModLoader instance = new LogicSimModLoader();
@@ -103,6 +92,8 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
 
         ProgressBarManager.stepBar("Searching mods...");
         loader.searchMods();
+        //inject mod container
+        ModContainerInjectionHandler.injectNow();
         ProgressBarManager.stepBar("Registering mod hooks...");
         LSMLEventBus.EVENT_BUS.post(new LSMLRegistrationEvent());
         //Close registration window for CustomConfigLoaders

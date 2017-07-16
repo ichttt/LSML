@@ -10,7 +10,6 @@ import ichttt.logicsimModLoader.gui.ModListGui;
 import ichttt.logicsimModLoader.gui.IModGuiInterface;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.internal.SaveHandler;
-import ichttt.logicsimModLoader.loader.Loader;
 import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.LSMLUtil;
 
