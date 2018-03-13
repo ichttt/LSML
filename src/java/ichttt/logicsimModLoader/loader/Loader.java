@@ -13,6 +13,9 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -145,7 +148,7 @@ public class Loader {
                     continue;
                 }
 
-                Class<?> modClass = Class.forName(pathToInstance, true, LSMLClassLoader.INSTANCE);
+                Class<?> modClass = Class.forName(pathToInstance);
                 Mod currentMod = LSMLUtil.getModAnnotationForClass(modClass);
                 if (currentMod == null) {
                     LSMLLog.warning("Could not find Mod annotation for %s, skipping!", modFile);
@@ -172,8 +175,7 @@ public class Loader {
         LSMLLog.info("Successfully injected %s mods.", modFiles.size());
     }
 
-    private void register(Class<?> clazz) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        clazz = Class.forName(clazz.getName(), true, LSMLClassLoader.INSTANCE);
+    private void register(Class<?> clazz) throws IllegalAccessException, InstantiationException {
         LSMLEventBus.EVENT_BUS.register(clazz.newInstance());
     }
 
@@ -220,11 +222,13 @@ public class Loader {
 
     private static boolean addURL(File file) {
         try {
-            LSMLClassLoader.INSTANCE.addURL(file.toURI().toURL());
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class); //THX people over at stackoverflow
+            method.setAccessible(true);
+            method.invoke(ClassLoader.getSystemClassLoader(), file.toURI().toURL()); // Hack the system Classloader
             LSMLLog.fine("Added file %s to the classpath", file);
             return true;
         }
-        catch (Exception e) {
+        catch (Throwable e) {
             LSMLLog.error("Could not add file %s to the classloader. Exception caught: %s\nThis file will be skipped", file, e);
             return false;
         }
