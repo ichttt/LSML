@@ -3,6 +3,7 @@ package ichttt.logicsimModLoader;
 import ichttt.logicsimModLoader.exceptions.InvalidVersionStringException;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * A basic version system. The version is immutable
@@ -86,5 +87,17 @@ public class VersionBase implements Comparable<VersionBase> {
             return toCompare.compareTo(this) == 0;
         }
         return false;
+    }
+
+    /**
+     * @since 0.3.2
+     */
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash = 31 * hash + major;
+        hash = 31 * hash + minor;
+        hash = 31 * hash + patch;
+        return hash;
     }
 }

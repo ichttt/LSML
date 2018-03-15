@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -89,7 +90,7 @@ public class LSMLUtil {
      * @return The mod annotation or null if not present
      * @since 0.0.1
      */
-    public static Mod getModAnnotationForClass(Class clazz){
+    public static Mod getModAnnotationForClass(Class clazz) {
         Annotation annotation = clazz.getAnnotation(Mod.class);
         if (annotation != null) {
             return (Mod) annotation;
@@ -121,8 +122,7 @@ public class LSMLUtil {
             JOptionPane.showMessageDialog(null, message, title, messageType);
     }
 
-    public static void unzipZipFile(File zipFile, File outputFolder){
-
+    public static void unzipZipFile(File zipFile, File outputFolder) {
         byte[] buffer = new byte[4096];
         ZipInputStream zis = null;
         try {
@@ -136,6 +136,7 @@ public class LSMLUtil {
                     continue;
                 }
                 FileOutputStream output = null;
+                //noinspection ResultOfMethodCallIgnored
                 (new File(newFile.getAbsolutePath()).getParentFile()).mkdirs();
                 try {
                     output = new FileOutputStream(newFile);
@@ -162,8 +163,7 @@ public class LSMLUtil {
      * @since 0.0.1
      */
     public static <T> T[] inverseObjectArray(T[] input) {
-        for(int i = 0; i < input.length / 2; i++)
-        {
+        for(int i = 0; i < input.length / 2; i++) {
             T temp = input[i];
             input[i] = input[input.length - i - 1];
             input[input.length - i - 1] = temp;

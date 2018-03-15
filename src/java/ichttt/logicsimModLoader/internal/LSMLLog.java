@@ -24,6 +24,10 @@ public class LSMLLog {
      */
     public static Logger getCustomLogger(String modid) {
         Logger logger = Logger.getLogger(modid);
+        if (handler == null) {
+            logger.severe("Cannot enable file logging for this logger: The handler has not been created");
+            return logger;
+        }
         logger.addHandler(handler);
         logger.fine("Set up logger for " + modid);
         return logger;
@@ -39,11 +43,13 @@ public class LSMLLog {
         }
         logger.setLevel(Level.ALL);
         hasInit = true;
-        String logPath = Loader.getInstance().basePath.toString() + "/log";
-        if ((new File(logPath)).mkdirs()) {
+        File logPath = new File(Loader.getInstance().basePath.toString() + "/log");
+        if (!logPath.exists() && !logPath.mkdirs()) {
             LSMLLog.error("Could not create log save dirs!");
+            LSMLLog.error("Disabling file logging");
             return;
         }
+
         try {
             handler = new FileHandler(logPath + "/LSMLLog.log");
         } catch (IOException e) {
