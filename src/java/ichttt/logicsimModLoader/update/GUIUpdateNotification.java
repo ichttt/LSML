@@ -1,7 +1,6 @@
 package ichttt.logicsimModLoader.update;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import ichttt.logicsimModLoader.VersionBase;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -269,13 +267,17 @@ public class GUIUpdateNotification implements ListSelectionListener, HyperlinkLi
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        if (event.getActionCommand().equals("update")) {
-            UpdateThreadSingleObject threadSingleObject = new UpdateThreadSingleObject(activeUpdateContext, updateMap.get(activeUpdateContext), this);
-            constructAndRunUpdateThread(threadSingleObject);
-        } else if (event.getActionCommand().equals("visit"))
-            UpdateUtil.openWebsite(activeUpdateContext.getWebsite());
-        else
-            throw new RuntimeException("Invalid actionCommand " + event.getActionCommand());
+        switch (event.getActionCommand()) {
+            case "update":
+                UpdateThreadSingleObject threadSingleObject = new UpdateThreadSingleObject(activeUpdateContext, updateMap.get(activeUpdateContext), this);
+                constructAndRunUpdateThread(threadSingleObject);
+                break;
+            case "visit":
+                UpdateUtil.openWebsite(activeUpdateContext.getWebsite());
+                break;
+            default:
+                throw new RuntimeException("Invalid actionCommand " + event.getActionCommand());
+        }
     }
 
     private void callbackBaseTasks(UpdateContext ctx) {

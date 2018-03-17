@@ -3,6 +3,7 @@ package ichttt.logicsimModLoader.util;
 import ichttt.logicsimModLoader.api.Mod;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
+import ichttt.logicsimModLoader.loader.Loader;
 import logicsim.App;
 
 import javax.annotation.Nullable;
@@ -13,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -81,7 +81,17 @@ public class LSMLUtil {
      * @since 0.0.1
      */
     public static Mod getModAnnotationForClass(String className) throws ClassNotFoundException {
-        return getModAnnotationForClass(Class.forName(className));
+        Class cls;
+        try {
+            cls = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            ClassLoader modClsLoader = Loader.getInstance().getModClassLoader();
+            if (modClsLoader != null)
+                cls = Class.forName(className, true, modClsLoader);
+            else
+                throw e;
+        }
+        return getModAnnotationForClass(cls);
     }
 
     /**

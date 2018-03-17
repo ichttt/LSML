@@ -90,7 +90,7 @@ public final class LogicSimModLoader implements Thread.UncaughtExceptionHandler 
             }
         }));
         registerSubscriptions();
-        i18n = new I18nHelper("lsml");
+        i18n = new I18nHelper("lsml", ClassLoader.getSystemClassLoader());
 
         //Init our mod first
         try {
