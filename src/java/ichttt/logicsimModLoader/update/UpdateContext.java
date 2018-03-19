@@ -111,14 +111,16 @@ public class UpdateContext implements Comparable<UpdateContext> {
      * This is only necessary for enable auto update
      * <br><b>THIS REQUIRES YOUR JAR TO BE SIGNED AND WILL DISABLE UPDATING IF NO CERTIFICATE IS FOUND!</b>
      * <br>If the downloaded jar does not match this fingerprint, the update will be rolled back.
+     * <b>NOT YET WORKING!</b>
      * @since 0.3.1
      */
-    @Nonnull
+    @Nonnull //TODO fix this
     public UpdateContext enableCertificateValidation() throws ModException {
-        Certificate[] certificates = linkedModContainer.getClass().getProtectionDomain().getCodeSource().getCertificates();
-        if (certificates == null)
-            throw new ModException(linkedModContainer.mod, "Could not find certificates!");
-        this.certificates = certificates;
+        LSMLLog.warning("Certificate Update validation not yet working!");
+//        Certificate[] certificates = linkedModContainer.getClass().getProtectionDomain().getCodeSource().getCertificates();
+//        if (certificates == null)
+//            throw new ModException(linkedModContainer.mod, "Could not find certificates!");
+//        this.certificates = certificates;
         return this;
     }
 

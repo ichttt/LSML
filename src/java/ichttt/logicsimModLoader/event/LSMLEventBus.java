@@ -34,6 +34,7 @@ public class LSMLEventBus implements SubscriberExceptionHandler {
             try {
                 Method save = LSFrame.class.getDeclaredMethod("jMenuItem_saveas_actionPerformed", ActionEvent.class);
                 save.setAccessible(true);
+                //noinspection JavaReflectionInvocation
                 save.invoke(app.lsframe, (ActionEvent) null);
             } catch (Exception e) {
                 e.printStackTrace();

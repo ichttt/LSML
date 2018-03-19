@@ -13,7 +13,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.List;
@@ -72,7 +75,7 @@ public class ConfigTest {
         Config.registerCustomEntryParser(new DuplicateParser());
         Config.registerCustomEntryParser(new DuplicateParser());
         Config.registerCustomEntryParser(new LegitParser());
-        Assert.assertTrue(parsers.size() == 2);
+        Assert.assertEquals(2, parsers.size());
     }
 
     private static class DuplicateParser implements IConfigEntryParser {
